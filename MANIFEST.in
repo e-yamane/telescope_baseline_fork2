@@ -1,0 +1,12 @@
+include src/exocounts/data/mag.list
+
+graft tests
+graft examples
+graft docs
+
+global-exclude *.py[co]
+
+prune docs/_build
+prune docs/_static
+prune docs/_templates
+prune docs/_build/doctrees/index.doctree
