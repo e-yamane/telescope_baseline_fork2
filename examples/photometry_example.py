@@ -38,11 +38,6 @@ target.d=16.0*u.pc #change targets
 obs.target = target
 obs.update()
 
-magdict=convmag.get_magdict()
-print("H mag=",convmag.get_mag("H",obs.flux,magdict))
-print("J mag=",convmag.get_mag("J",obs.flux,magdict))
-print("Hw mag=",0.7*convmag.get_mag("J",obs.flux,magdict)+0.3*convmag.get_mag("H",obs.flux,magdict))
-print("V mag=",convmag.get_mag("V",obs.flux,magdict))
 print("=========================")
 print("saturation?",obs.sat)
 print("dark [ppm]=",obs.sigd)
