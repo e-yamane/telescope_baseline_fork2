@@ -18,7 +18,7 @@ def test_get_mag():
     band = "J"
     magdict = get_magdict()
     flux=3.3113112148259078e-09*u.erg/u.s/u.m/u.m/u.nm
-    print(get_mag(band, flux, magdict))
+    assert get_mag(band, flux, magdict)==10.0
 
 
 if __name__ == "__main__":
