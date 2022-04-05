@@ -25,7 +25,7 @@ def get_magdict(maglist=None):
 
 
 def get_flux(band, mag, magdict):
-    """compute flux from mag
+    """compute flux (per-wavelength form, f_lambda) from mag
 
     Args:
        band: band symbol (J,H, etc..)
@@ -33,7 +33,7 @@ def get_flux(band, mag, magdict):
        maglist: infromation table of maglist
 
     Returns:
-       flux with the unit of astropy
+       flux (per-wavelength form, f_lambda) with the unit of astropy
 
     """
     
@@ -44,11 +44,11 @@ def get_flux(band, mag, magdict):
 
 
 def get_mag(band, flux, magdict):
-    """compute mag from flux
+    """compute mag from flux (per-wavelength form, f_lambda)
 
     Args:
        band: band symbol (J,H, etc..)
-       flux: flux with the unit of astropy
+       flux: flux (per-wavelength form, f_lambda) with the unit of astropy
        maglist: infromation table of maglist
 
     Returns:
