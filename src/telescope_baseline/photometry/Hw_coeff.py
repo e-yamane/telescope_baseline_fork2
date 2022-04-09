@@ -116,8 +116,8 @@ def load_filter():
     return fltJ, fltH
 
 
-def Hw_func(lower, upper):
-    """Hw function
+def set_range_Hw_band(lower, upper):
+    """set range of Hw band
 
     Args: 
         lower: lower wavelength in the unit of angstrom
@@ -169,46 +169,64 @@ def least_sq(coeff, *args):
     chi2 = np.sum(np.square(quad_func(x, coeff)-y))**0.5
     return chi2
 
+def read_spectra_all():
+    """Read all stellar spectra
 
-def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
+    Returns:
+        all spectra
 
-    # >> >> load spectra file names
-    
+    """
     speclist=pkg_resources.resource_filename('telescope_baseline', 'data/speclist.txt')
     f=open(speclist,"r")
     spectra_all=f.readlines()
     f.close()
     spectra_all=[s.replace('\n', '') for s in spectra_all]
+    return spectra_all
 
-    data_spec = read_map_multi(spectra_all)
-    # << <<
+def calc_zero_magnitude_spectra(fil_J, fil_H, fil_Hw):
+    """zero magnitude spectra
 
-    # >> >> >> set range of Hw band
-    fil_Hw = Hw_func(Hw_l, Hw_u)
-    # << << <<
+    Args:
+        fil_J:
+        fil_H:
+        fil_Hw:
+    
+    Returns:
+        zero magnitude of J?
+        zero magnitude of H?
+        zero magnitude of Hw?
 
-    # >> >> >> zero magnitude spectra
+    """
+    
     uka0v = pkgutil.get_data('telescope_baseline', 'data//spectra/uka0v.dat')
-    spec_a0v = np.loadtxt(ByteIO(uka0v), comments='#', dtype='f8').T
-    fil_J, fil_H = load_filter()
-
+    spec_a0v = np.loadtxt(BytesIO(uka0v), comments='#', dtype='f8').T
     p_Jo = cal_photon([spec_a0v, fil_J, 0])
     p_Ho = cal_photon([spec_a0v, fil_H, 0])
     p_Hwo = cal_photon([spec_a0v, fil_Hw, 0])
-    # << << <<
+    return p_Jo, p_Ho, p_Hwo
 
-    plt.figure(figsize=(5, 5.5))
-    plt.rcParams['font.family'] = 'Arial'
+def calc_color_arrays(data_spec, fil_J, fil_H, fil_Hw, p_Jo, p_Ho, p_Hwo):
+    """compute colors
 
-    ax0 = plt.subplot2grid((5, 1), (0, 0), rowspan=4)
-    ax1 = plt.subplot2grid((5, 1), (4, 0), rowspan=1, sharex=ax0)
-    ax0.grid(color='gray', ls=':', lw=0.5)
-    ax1.grid(color='gray', ls=':', lw=0.5)
+    Args:
+        data_spec:
+        fil_J:
+        fil_H: 
+        fil_Hw: 
+        p_Jo: zero magnitude of J?
+        p_Ho:  zero magnitude of H?
+        p_Hwo:  zero magnitude of Hw?
 
+    Returns:
+        ar_J_H: J-H array
+        ar_Hw_H: Hw-H array
+        Av array used 
+
+    """
     Av_ar = np.linspace(0, 60, 5)
-
     ar_Hw_H = []
     ar_J_H = []
+    A_arr=[]
     for Av in Av_ar:  # -- roop for Av
         p_J = calphoton_map_multi(data_spec, fil_J, Av)
         p_H = calphoton_map_multi(data_spec, fil_H, Av)
@@ -223,34 +241,69 @@ def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
 
         ar_Hw_H.append(Hw_H)
         ar_J_H.append(J_H)
-        A_str = str(Av)
-        #plt.scatter(J_H, Hw_H, s=5, label='Av = '+A_str)
-        ax0.scatter(J_H, Hw_H, s=5, label='Av = '+A_str)
+        A_arr.append(Av)
+        
+    return ar_J_H, ar_Hw_H, A_arr
 
-    ar_Hw_H = np.ravel(np.array(ar_Hw_H))
-    ar_J_H = np.ravel(np.array(ar_J_H))
+def calc_colors(ar_J_H, ar_Hw_H):
+    """
+    Args:
+       ar_J_H: J-H array
+       ar_Hw_H: Hw-H array
 
-    colors = (ar_J_H, ar_Hw_H)
+    Returns:
+       colors
+    """
+    return (np.ravel(np.array(ar_J_H)),np.ravel(np.array(ar_Hw_H)))
 
-    # >> >> >> optimize coefficients
+
+def compute_Hw_relation(Hw_l, Hw_u):
+    """compute Hw - (H, J-H) relation
+
+    Args:
+       Hw_l: lower limit of passband in angstrom
+       Hw_u: upper limit of passband in angstrom
+
+    Returns:
+       minimize instance
+       sigma
+       colors
+       J-H array
+       Hw-H array
+       fitting residuals
+    """
+    data_spec = read_map_multi(read_spectra_all())
+    fil_Hw = set_range_Hw_band(Hw_l, Hw_u)
+    fil_J, fil_H = load_filter()
+    p_Jo, p_Ho, p_Hwo=calc_zero_magnitude_spectra(fil_J, fil_H, fil_Hw)
+    ar_J_H, ar_Hw_H, Av_arr = calc_color_arrays(data_spec, fil_J, fil_H, fil_Hw, p_Jo, p_Ho, p_Hwo)
+    colors=calc_colors(ar_J_H, ar_Hw_H)
     x0 = [1., 0.8]
     res = minimize(least_sq, x0, args=colors, method='Nelder-Mead', tol=1e-11)
-    # << << <<
-
-    zansa = colors[1] - quad_func(colors[0], res.x)
-    sigma = np.std(zansa)
-    #print(sigma, res.x, res.fun)
-    # print(res.x)
+    residuals = colors[1] - quad_func(colors[0], res.x)
+    sigma = np.std(residuals)
     result = {'x0': res.x[0],
               'x1': res.x[1],
               'std': sigma,
               'chi2': res.fun}
+    print(result)
 
-    # print("---")
-    # print(result)
+    return res, sigma, colors, ar_J_H, ar_Hw_H, residuals
 
-    # >> >> >> plot
+def plot_Hwfit(Hw_l,Hw_u,res, sigma, colors, ar_J_H, ar_Hw_H, residuals):
+    """plot Hw fitting results
+    
+    Args:
+       Hw_l: lower limit of passband in angstrom
+       Hw_u: upper limit of passband in angstrom
+       res:minimize instance
+       sigma:sigma
+       colors:colors
+       ar_J_H:J-H array
+       ar_Hw_H:Hw-H array
+       residuals:fitting residuals
 
+    """
     a_str = str('{:.5f}'.format(res.x[0]))
     b_str = str('{:.5f}'.format(res.x[1]))
     pl_txt1 = '$y$ = '+a_str+' $x^2$ + '+b_str+' $x$'
@@ -259,6 +312,16 @@ def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
 
     x_pl = np.linspace(min(colors[0]), max(colors[0]), 1000)
     y_pl = quad_func(x_pl, res.x)
+
+
+    plt.figure(figsize=(5, 5.5))
+    ax0 = plt.subplot2grid((5, 1), (0, 0), rowspan=4)
+    ax1 = plt.subplot2grid((5, 1), (4, 0), rowspan=1, sharex=ax0)
+    ax0.grid(color='gray', ls=':', lw=0.5)
+    ax1.grid(color='gray', ls=':', lw=0.5)
+    for i in range(len(ar_J_H)):
+        ax0.scatter(ar_J_H[i], ar_Hw_H[i], s=5)#, label='Av = '+str(Av_arr[i]))
+    
     ax0.plot(x_pl, y_pl, ls='--', c='black', lw=1)
     ax0.text(x_pl[int((len(x_pl)*0.3))], y_pl[int((len(y_pl)*0.1))],
              pl_txt1, fontsize=12)
@@ -269,32 +332,26 @@ def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
     ax0.legend(fontsize=10, loc='upper left')
     ax0.plot(x_pl, y_pl, ls='--', c='black', lw=1)
 
-    ax1.scatter(colors[0], zansa, s=5, c='gray')
+    ax1.scatter(colors[0], residuals, s=5, c='gray')
     ax1.set_xlabel('$J - H$', fontsize=15)
     plt.subplots_adjust(hspace=.0)
-    # plt.show()
-
     plt.savefig('Hwcolor_'+str(int(Hw_l)) + '_' +
                 str(int(Hw_u))+'.png', dpi=200)
-    # << << <<
-    #
-    return result
+    plt.show()
 
 
 if __name__ == '__main__':
-    # print(sys.argv)
-    if len(sys.argv) == 6:
-        regex_spec = sys.argv[1]
-        J_filter = sys.argv[2]
-        H_filter = sys.argv[3]
-        Hw_low = float(sys.argv[4])
-        Hw_up = float(sys.argv[5])
-
-        result = main(regex_spec, J_filter, H_filter, Hw_low, Hw_up)
-
-        print(result)
+    if len(sys.argv) == 3:
+        Hw_l = float(sys.argv[1])
+        Hw_u = float(sys.argv[2])
     else:
         print(
-            'usage) [spectra dir] [J band filter] [H band filter] [Hw lower] [Hw upper]')
+            'usage) [Hw lower] [Hw upper]')
         print(
-            'ex) '+sys.argv[0]+' ./spectra/ ./filter/J_filter.dat ./filter/H_filter.dat 9000 15000')
+            'ex) '+sys.argv[0]+' 9000 15000')
+
+    
+    res, sigma, colors, ar_J_H, ar_Hw_H, residuals=compute_Hw_relation(Hw_l, Hw_u)
+    plot_Hwfit(Hw_l,Hw_u,res, sigma, colors, ar_J_H, ar_Hw_H, residuals)
+
+
