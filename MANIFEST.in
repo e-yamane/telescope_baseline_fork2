@@ -1,4 +1,7 @@
 include src/telescope_baseline/data/mag.list
+include src/telescope_baseline/data/filter/H_filter.dat
+include src/telescope_baseline/data/filter/J_filter.dat
+include src/telescope_baseline/data/spectra/*.dat
 
 graft tests
 graft examples

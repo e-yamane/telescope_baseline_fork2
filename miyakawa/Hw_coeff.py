@@ -8,17 +8,27 @@ import pandas as pd
 import os
 from multiprocessing import Pool
 from astropy import units as u
-
+import pkgutil
+from io import BytesIO
 from scipy import interpolate
 from scipy.optimize import minimize
 
-#-- load spectra files here
-def load_spectra(file_path):
-    return np.loadtxt(file_path, comments='#', dtype='f8').T
+def load_stellar_spectra(file_path):
+    """Load stellar spectra
+
+    Args:
+       file_path: path to the spectrum file
+
+    Returns:
+       spectral data
+
+    """
+    ascii_data=pkgutil.get_data('telescope_baseline', 'data/spectra/'+file_path)
+    return np.loadtxt(BytesIO(ascii_data), comments='#', dtype='f8').T
 
 def read_map_multi(spectra_all):
     p   = Pool(os.cpu_count())
-    data_spec   = p.map(load_spectra, spectra_all) # map で並列読み込み
+    data_spec   = p.map(load_stellar_spectra, spectra_all) # map で並列読み込み
     p.close()
     return data_spec
 #--
@@ -59,12 +69,19 @@ def calphoton_map_multi(data_spec, filter_func, Av):
     return data_photon
 
 
-def load_filter(fl_J, fl_H):
-    #fl_J    = "./filter/J_filter.dat"
-    #fl_H    = "./filter/H_filter.dat"
+def load_filter():
+    """Load filters
 
-    fltJ    = np.loadtxt(fl_J, comments="#", dtype='f8').T
-    fltH    = np.loadtxt(fl_H, comments="#", dtype='f8').T
+    Returns:
+        Jband filter
+        Hbandfilter
+    
+    """
+    
+    fl_J=pkgutil.get_data('telescope_baseline', 'data/filter/J_filter.dat')
+    fl_H=pkgutil.get_data('telescope_baseline', 'data/filter/H_filter.dat')
+    fltJ    = np.loadtxt(BytesIO(fl_J), comments="#", dtype='f8').T
+    fltH    = np.loadtxt(BytesIO(fl_H), comments="#", dtype='f8').T
     fltJ[1] = fltJ[1]*1e4 #mic -> angstrom
     fltH[1] = fltH[1]*1e4
 
@@ -114,8 +131,9 @@ def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
     # << << <<
 
     # >> >> >> zero magnitude spectra
-    spec_a0v    = np.loadtxt("./spectra/uka0v.dat",comments='#',dtype='f8').T
-    fil_J,fil_H = load_filter(J_filter, H_filter)
+    uka0v=pkgutil.get_data('telescope_baseline', 'data//spectra/uka0v.dat')    
+    spec_a0v    = np.loadtxt(ByteIO(uka0v),comments='#',dtype='f8').T
+    fil_J,fil_H = load_filter()
 
     p_Jo    = cal_photon([spec_a0v, fil_J, 0])
     p_Ho    = cal_photon([spec_a0v, fil_H, 0])
