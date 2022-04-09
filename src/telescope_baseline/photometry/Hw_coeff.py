@@ -9,6 +9,7 @@ import os
 from multiprocessing import Pool
 from astropy import units as u
 import pkgutil
+import pkg_resources           
 from io import BytesIO
 from scipy import interpolate
 from scipy.optimize import minimize
@@ -172,10 +173,13 @@ def least_sq(coeff, *args):
 def main(regex_spec, J_filter, H_filter, Hw_l, Hw_u):
 
     # >> >> load spectra file names
-    spec = pkgutil.get_data(
-        'telescope_baseline', 'data/spectra/*')
-    print(spec)
-    spectra_all = sorted(glob.glob(regex_spec+'/*'))
+    
+    speclist=pkg_resources.resource_filename('telescope_baseline', 'data/speclist.txt')
+    f=open(speclist,"r")
+    spectra_all=f.readlines()
+    f.close()
+    spectra_all=[s.replace('\n', '') for s in spectra_all]
+
     data_spec = read_map_multi(spectra_all)
     # << <<
 
