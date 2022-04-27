@@ -1,3 +1,6 @@
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB
+import pytest
+
 def test_cos_angle_from_normal_vectorAB():
   a=np.array([1,0,0])
   b=np.array([0,1,0])
