@@ -1,6 +1,37 @@
 import numpy as np
 from healpy.pixelfunc import ang2vec, vec2ang
 
+def single_detector_convex(ang_detector,PA,width):
+    """
+    Args: 
+        ang_detector: theta, phi of the detector
+        PA: position angle of the detector (north up)
+        width: detector width in radian
+    Returns:
+        detecter covex
+    
+    """
+    
+    thetac,phic=ang_detector
+    ez=np.array([0.0,0.0,1.0])
+    half_diagonal_angle=width/np.sqrt(2.0)
+    e0=Roty(half_diagonal_angle)@ez
+    convex0=np.array([Rotz(-3.0*np.pi/4.0)@e0,Rotz(-np.pi/4.0)@e0,Rotz(np.pi/4.0)@e0,Rotz(3.0*np.pi/4.0)@e0])
+    #for i in range(0,4):
+    #    c=Rotz(phic)@Roty(thetac)@Rotz(PA)@convex0[i,:]
+    C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
+    C=np.einsum('ij,kj->ki',Roty(thetac),C)
+    C=np.einsum('ij,kj->ki',Rotz(phic),C)
+    print(C)
+    return C.T
+
+
+def Roty(theta):
+    return np.array([[np.cos(theta),0.0,np.sin(theta)],[0.0,1.0,0.0],[-np.sin(theta),0.0,np.cos(theta)]])
+
+def Rotz(theta):
+    return np.array([[np.cos(theta),-np.sin(theta),0.0],[np.sin(theta),np.cos(theta),0.0],[0.0,0.0,1.0]])
+
 def vec2ring(x):
     """convert a vector to a ring
     Args:
@@ -53,7 +84,36 @@ def convex_on_sphere(angv,angw):
     return np.prod(mask,axis=0)
 
 
+def test_single_detector_convex():
+    convex=single_detector_convex(np.array([np.pi/10.0,np.pi/9.0]),np.pi/5.0,np.pi/8.0)
 
+
+def test_single_detector_convex_in():
+    convex=single_detector_convex(np.array([np.pi/10.0,np.pi/9.0]),np.pi/5.0,np.pi/8.0)
+    w=np.array([0,0,1])
+    q=np.array([1/np.sqrt(2.0),1/np.sqrt(2.0),1/np.sqrt(4.0)])
+    v=np.array([w,q,w,q])
+    angw=np.array(vec2ang(v))    
+    ans=convex_on_sphere(convex,angw)    
+    print(ans)
     
-#if __name__ == "__main__":
-#    test_convex_on_sphere_map()
+if __name__ == "__main__":
+    from telescope_baseline.mapping.randomtarget import rantarget
+    targets=rantarget(N=100000)
+    convex=single_detector_convex(np.array([np.pi/4.0,0.0*np.pi/9.0]),np.pi/5.0,np.pi/4.0)
+    ans=convex_on_sphere(convex,targets)
+    ans=np.array(ans,dtype=np.bool)
+    print(ans)
+    print(np.shape(targets))
+    
+    import matplotlib.pyplot as plt
+    from healpy.visufunc import projscatter
+    import healpy as hp
+    Nside=16
+    emparr=np.zeros(hp.nside2npix(Nside))
+    hp.mollview(emparr,cmap="bwr")
+    projscatter(targets,alpha=0.4,marker="+")
+    projscatter(targets[:,ans],alpha=0.4,marker="+")
+    print(np.sum(ans))
+    #    frame()
+    plt.show()
