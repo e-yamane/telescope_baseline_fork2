@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, single_detector_convex
 from healpy.pixelfunc import vec2ang
 import numpy as np
 import pytest
