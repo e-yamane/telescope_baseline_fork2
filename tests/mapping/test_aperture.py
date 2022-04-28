@@ -46,3 +46,13 @@ def test_convex_on_sphere_map():
     angw=np.array(vec2ang(v))
     ans=convex_on_sphere(angv,angw)
     assert (np.sum((ans - [0,1,0,1])**2)) == 0
+
+def test_single_detector_convex_in():
+    from telescope_baseline.mapping.randomtarget import rantarget
+    np.random.seed(1)
+    targets=rantarget(N=100000)
+    convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
+    ans=convex_on_sphere(convex,targets)
+    ans=np.array(ans,dtype=np.bool)
+    assert np.sum(ans)==3171
+    return targets,ans

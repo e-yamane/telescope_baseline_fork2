@@ -86,31 +86,25 @@ def convex_on_sphere(angv,angw):
 
 
 def test_single_detector_convex_in():
-    convex=single_detector_convex(np.array([np.pi/10.0,np.pi/9.0]),np.pi/5.0,np.pi/8.0)
-    w=np.array([0,0,1])
-    q=np.array([1/np.sqrt(2.0),1/np.sqrt(2.0),1/np.sqrt(4.0)])
-    v=np.array([w,q,w,q])
-    angw=np.array(vec2ang(v))    
-    ans=convex_on_sphere(convex,angw)    
-    print(ans)
-    
-if __name__ == "__main__":
     from telescope_baseline.mapping.randomtarget import rantarget
+    np.random.seed(1)
     targets=rantarget(N=100000)
     convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
     ans=convex_on_sphere(convex,targets)
     ans=np.array(ans,dtype=np.bool)
-    print(ans)
-    print(np.shape(targets))
+    assert np.sum(ans)==3171
+    return targets,ans
+    
+if __name__ == "__main__":
+
+    targets,ans=test_single_detector_convex_in()
     
     import matplotlib.pyplot as plt
     from healpy.visufunc import projscatter
     import healpy as hp
     Nside=16
-    emparr=np.zeros(hp.nside2npix(Nside))
+    emparr=np.zeros(hp.nside2npix(Nside))        
     hp.mollview(emparr,cmap="bwr")
     projscatter(targets,alpha=0.4,marker="+")
     projscatter(targets[:,ans],alpha=0.4,marker="+")
-    print(np.sum(ans))
-    #    frame()
     plt.show()
