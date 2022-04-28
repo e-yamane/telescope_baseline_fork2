@@ -22,8 +22,6 @@ def single_detector_convex(ang_detector,PA,width):
     C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
     C=np.einsum('ij,kj->ki',Roty(thetac),C)
     C=np.einsum('ij,kj->ki',Rotz(phic),C)
-    print(C)
-
     Cang = vec2ang(C)
     return Cang
 
@@ -54,14 +52,14 @@ def vec2ring(x):
 def cos_angle_from_normal_vectorAB(a,b,x):
     """cos angle between the normal vector defined by a, b and x
     Args:
-       a: 3D vetcor of A
-       b: 3D vector of B
-       x: vectors whose cos angle from normal vector of the ABO plane to be computed
+       a: 3D vetcor of A, (3,) or (N, 3)
+       b: 3D vector of B, (3,) or (N, 3)
+       x: vectors whose cos angle from normal vector of the ABO plane to be computed 3 or (M, 3)
      
     Returns:
-       cos_angles
+       cos_angles, float or (N,M)
     """
-    return x@np.cross(a,b) 
+    return (x@np.cross(a,b).T).T
 
 
 def convex_on_sphere(angv,angw):
@@ -77,16 +75,14 @@ def convex_on_sphere(angv,angw):
     w=ang2vec(angw[0],angw[1])
     Nvertex,Ncoordinate=np.shape(v)
     ring=vec2ring(v)
-    cosa=[]
-    for i in range(0,Nvertex):
-        cosa.append(cos_angle_from_normal_vectorAB(ring[i,0,:],ring[i,1,:],w))
-    cosa = np.array(cosa)
+    #cosa=[]
+    #for i in range(0,Nvertex):
+    #    cosa.append(cos_angle_from_normal_vectorAB(ring[i,0,:],ring[i,1,:],w))
+    #cosa = np.array(cosa)
+    cosa=cos_angle_from_normal_vectorAB(ring[:,0,:],ring[:,1,:],w)
+    print(np.shape(cosa))
     mask=(cosa>=0.0)*(cosa<=1.0)
     return np.prod(mask,axis=0)
-
-
-def test_single_detector_convex():
-    convex=single_detector_convex(np.array([np.pi/10.0,np.pi/9.0]),np.pi/5.0,np.pi/8.0)
 
 
 def test_single_detector_convex_in():
@@ -102,9 +98,6 @@ if __name__ == "__main__":
     from telescope_baseline.mapping.randomtarget import rantarget
     targets=rantarget(N=100000)
     convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
-
-
-    ###
     ans=convex_on_sphere(convex,targets)
     ans=np.array(ans,dtype=np.bool)
     print(ans)
