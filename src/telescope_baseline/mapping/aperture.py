@@ -8,7 +8,7 @@ def single_detector_convex(ang_detector,PA,width):
         PA: position angle of the detector (north up)
         width: detector width in radian
     Returns:
-        detecter covex
+        detecter convex (ang)
     
     """
     
@@ -23,7 +23,9 @@ def single_detector_convex(ang_detector,PA,width):
     C=np.einsum('ij,kj->ki',Roty(thetac),C)
     C=np.einsum('ij,kj->ki',Rotz(phic),C)
     print(C)
-    return C.T
+
+    Cang = vec2ang(C)
+    return Cang
 
 
 def Roty(theta):
@@ -71,7 +73,6 @@ def convex_on_sphere(angv,angw):
     Returns:
         1 (in convex) or 0 (out of convex)
     """
-
     v=ang2vec(angv[0],angv[1])
     w=ang2vec(angw[0],angw[1])
     Nvertex,Ncoordinate=np.shape(v)
@@ -100,7 +101,10 @@ def test_single_detector_convex_in():
 if __name__ == "__main__":
     from telescope_baseline.mapping.randomtarget import rantarget
     targets=rantarget(N=100000)
-    convex=single_detector_convex(np.array([np.pi/4.0,0.0*np.pi/9.0]),np.pi/5.0,np.pi/4.0)
+    convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
+
+
+    ###
     ans=convex_on_sphere(convex,targets)
     ans=np.array(ans,dtype=np.bool)
     print(ans)
