@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, single_detector_convex
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes
 from healpy.pixelfunc import vec2ang
 import numpy as np
 import pytest
@@ -47,12 +47,20 @@ def test_convex_on_sphere_map():
     ans=convex_on_sphere(angv,angw)
     assert (np.sum((ans - [0,1,0,1])**2)) == 0
 
-def test_single_detector_convex_in():
+def test_square_convex_in():
     from telescope_baseline.mapping.randomtarget import rantarget
     np.random.seed(1)
     targets=rantarget(N=100000)
-    convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
-    ans=convex_on_sphere(convex,targets)
-    ans=np.array(ans,dtype=np.bool)
+    ans=inout_single_square_covex(targets,np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
     assert np.sum(ans)==3171
+    return targets,ans
+
+def test_four_square_convexes_in():
+    from telescope_baseline.mapping.randomtarget import rantarget
+    np.random.seed(1)
+    Ntarget=100000
+    fac=0.2
+    targets=rantarget(N=Ntarget)
+    ans=inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,fac*np.pi/4.0, fac*np.pi/4.0*0.8)
+    assert np.sum(ans)==270
     return targets,ans

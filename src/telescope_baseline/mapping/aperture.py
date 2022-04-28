@@ -1,10 +1,12 @@
 import numpy as np
 from healpy.pixelfunc import ang2vec, vec2ang
 
-def single_detector_convex(ang_detector,PA,width):
-    """
+                         
+
+def square_convex(center,PA,width):
+    """compute a single sqaure convex
     Args: 
-        ang_detector: theta, phi of the detector
+        center: theta, phi of the center
         PA: position angle of the detector (north up)
         width: detector width in radian
     Returns:
@@ -12,7 +14,7 @@ def single_detector_convex(ang_detector,PA,width):
     
     """
     
-    thetac,phic=ang_detector
+    thetac,phic=center
     ez=np.array([0.0,0.0,1.0])
     half_diagonal_angle=width/np.sqrt(2.0)
     e0=Roty(half_diagonal_angle)@ez
@@ -23,7 +25,7 @@ def single_detector_convex(ang_detector,PA,width):
     C=np.einsum('ij,kj->ki',Roty(thetac),C)
     C=np.einsum('ij,kj->ki',Rotz(phic),C)
     Cang = vec2ang(C)
-    return Cang
+    return np.array(Cang)
 
 
 def Roty(theta):
@@ -80,24 +82,80 @@ def convex_on_sphere(angv,angw):
     #    cosa.append(cos_angle_from_normal_vectorAB(ring[i,0,:],ring[i,1,:],w))
     #cosa = np.array(cosa)
     cosa=cos_angle_from_normal_vectorAB(ring[:,0,:],ring[:,1,:],w)
-    print(np.shape(cosa))
     mask=(cosa>=0.0)*(cosa<=1.0)
     return np.prod(mask,axis=0)
 
+def inout_single_square_covex(targets,center,PA,width):
+    """checking if targets are in or out single square convex
+    
+    Args:
+        center: theta, phi of the center in radian
+        PA: position angle in radian
+        width: square width
 
-def test_single_detector_convex_in():
-    from telescope_baseline.mapping.randomtarget import rantarget
-    np.random.seed(1)
-    targets=rantarget(N=100000)
-    convex=single_detector_convex(np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
+    Returns:
+        in = 1 or out = 0 mask
+    """
+    convex=square_convex(center,PA,width)
     ans=convex_on_sphere(convex,targets)
     ans=np.array(ans,dtype=np.bool)
-    assert np.sum(ans)==3171
-    return targets,ans
-    
-if __name__ == "__main__":
+    return ans
 
-    targets,ans=test_single_detector_convex_in()
+
+def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
+    """checking if targets are in or out four square convexes
+    
+    Args:
+        center: theta, phi of the center in radian
+        PA: position angle in radian
+        width: the separation of squares
+        each_width: square width
+
+    Returns:
+        in = 1 or out = 0 mask
+
+    """
+    
+    convex=square_convex(center,PA,width)
+    convex=np.array(convex)
+    convexes=[]
+    Ntarget=np.shape(targets)[1]
+    answers=np.zeros(Ntarget,dtype=np.bool)
+    for i in range(0,4):
+        each_convex=square_convex(convex[:,i],PA,each_width)
+        convexes.append(each_convex)
+        ans=convex_on_sphere(each_convex,targets)        
+        ans=np.array(ans,dtype=np.bool)
+        answers = answers + ans 
+    return answers
+
+
+
+
+if __name__ == "__main__":
+    def test_square_convex_in():
+        from telescope_baseline.mapping.randomtarget import rantarget
+        np.random.seed(1)
+        targets=rantarget(N=100000)
+        ans=inout_single_square_covex(targets,np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
+        assert np.sum(ans)==3171
+        return targets,ans
+    
+    def test_four_square_convexes_in():
+        from telescope_baseline.mapping.randomtarget import rantarget
+        np.random.seed(1)
+        Ntarget=100000
+        fac=0.2
+        targets=rantarget(N=Ntarget)
+        ans=inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,fac*np.pi/4.0, fac*np.pi/4.0*0.8)
+        assert np.sum(ans)==270
+        return targets,ans
+
+    
+#    targets,ans=test_square_convex_in()
+    targets,ans=test_four_square_convexes_in()
+    line="# of stars in the detector="+str(np.sum(ans))
+    print(line)
     
     import matplotlib.pyplot as plt
     from healpy.visufunc import projscatter
@@ -105,6 +163,7 @@ if __name__ == "__main__":
     Nside=16
     emparr=np.zeros(hp.nside2npix(Nside))        
     hp.mollview(emparr,cmap="bwr")
+    plt.title(line)
     projscatter(targets,alpha=0.4,marker="+")
     projscatter(targets[:,ans],alpha=0.4,marker="+")
     plt.show()
