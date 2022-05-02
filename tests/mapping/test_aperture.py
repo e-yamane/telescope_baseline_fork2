@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes, inout_detector
 from healpy.pixelfunc import vec2ang
 import numpy as np
 import pytest
@@ -63,4 +63,17 @@ def test_four_square_convexes_in():
     targets=rantarget(N=Ntarget)
     ans=inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,fac*np.pi/4.0, fac*np.pi/4.0*0.8)
     assert np.sum(ans)==270
+    return targets,ans
+
+def test_inout_detector():
+    np.random.seed(1)
+    Ntarget=100000
+    targets=np.array([np.random.normal(loc=np.pi/2.0,scale=np.pi/100.0,size=Ntarget),np.random.normal(loc=0.0,scale=np.pi/100.0,size=Ntarget)])
+    each_width_mm=19.52
+    width_mm=22.4
+    EFL_mm=4370.0
+    center=np.array([np.pi/2.0,0.0])
+    PA=0.0
+    ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    assert np.sum(ans)==1296
     return targets,ans

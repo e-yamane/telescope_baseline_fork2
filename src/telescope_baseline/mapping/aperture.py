@@ -114,8 +114,7 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
     Returns:
         in = 1 or out = 0 mask
 
-    """
-    
+    """    
     convex=square_convex(center,PA,width)
     convex=np.array(convex)
     convexes=[]
@@ -147,23 +146,21 @@ def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_
 
 if __name__ == "__main__":
     
-    def test_glactic_center():
-        from telescope_baseline.mapping.randomtarget import rantarget
+    def test_inout_detector():
         np.random.seed(1)
         Ntarget=100000
-        fac=0.2
         targets=np.array([np.random.normal(loc=np.pi/2.0,scale=np.pi/100.0,size=Ntarget),np.random.normal(loc=0.0,scale=np.pi/100.0,size=Ntarget)])
-
         each_width_mm=19.52
         width_mm=22.4
         EFL_mm=4370.0
         center=np.array([np.pi/2.0,0.0])
         PA=0.0
         ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+        assert np.sum(ans)==1296
         return targets,ans
 
     
-    targets,ans=test_glactic_center()
+    targets,ans=test_inout_detector()
     line="# of stars in the detector="+str(np.sum(ans))
     print(line)
     
