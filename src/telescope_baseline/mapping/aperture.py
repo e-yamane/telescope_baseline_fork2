@@ -129,31 +129,41 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         answers = answers + ans 
     return answers
 
+def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+    """checking if targets are in or out four square convexes
+    
+    Args:
+        center: theta, phi of the center in radian
+        PA: position angle in radian
+        width_mm: the separation of detector chips
+        each_width_mm: the chip width in the unit of mm
+        EFL_mm: effective focal length in the unit of mm
+    Returns:
+        in = 1 or out = 0 mask
 
-
+    """
+    return inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,0.0]),0.0,width_mm/EFL_mm, each_width_mm/EFL_mm)
+ 
 
 if __name__ == "__main__":
-    def test_square_convex_in():
-        from telescope_baseline.mapping.randomtarget import rantarget
-        np.random.seed(1)
-        targets=rantarget(N=100000)
-        ans=inout_single_square_covex(targets,np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
-        assert np.sum(ans)==3171
-        return targets,ans
     
-    def test_four_square_convexes_in():
+    def test_glactic_center():
         from telescope_baseline.mapping.randomtarget import rantarget
         np.random.seed(1)
         Ntarget=100000
         fac=0.2
-        targets=rantarget(N=Ntarget)
-        ans=inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,fac*np.pi/4.0, fac*np.pi/4.0*0.8)
-        assert np.sum(ans)==270
+        targets=np.array([np.random.normal(loc=np.pi/2.0,scale=np.pi/100.0,size=Ntarget),np.random.normal(loc=0.0,scale=np.pi/100.0,size=Ntarget)])
+
+        each_width_mm=19.52
+        width_mm=22.4
+        EFL_mm=4370.0
+        center=np.array([np.pi/2.0,0.0])
+        PA=0.0
+        ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
         return targets,ans
 
     
-#    targets,ans=test_square_convex_in()
-    targets,ans=test_four_square_convexes_in()
+    targets,ans=test_glactic_center()
     line="# of stars in the detector="+str(np.sum(ans))
     print(line)
     
@@ -162,7 +172,7 @@ if __name__ == "__main__":
     import healpy as hp
     Nside=16
     emparr=np.zeros(hp.nside2npix(Nside))        
-    hp.mollview(emparr,cmap="bwr")
+    hp.orthview(emparr,cmap="bwr")
     plt.title(line)
     projscatter(targets,alpha=0.4,marker="+")
     projscatter(targets[:,ans],alpha=0.4,marker="+")
