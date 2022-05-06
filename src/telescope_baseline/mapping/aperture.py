@@ -144,11 +144,8 @@ def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_
     return inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,0.0]),0.0,width_mm/EFL_mm, each_width_mm/EFL_mm)
  
 
-if __name__ == "__main__":
-    
-
-    def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
-        """Read JASMINE catalog 
+def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
+    """Read JASMINE catalog 
         
         Args:
             hdffile: HDF (ra,dec, ...) 
@@ -176,50 +173,54 @@ if __name__ == "__main__":
             >>> dat = pd.read_sql(sql=query, con=connection)
             >>> dat.to_hdf("cat.hdf", 'key', mode='w', complevel=5)
 
-        """
+    """
         
-        import pandas as pd
-        from astropy import units as u
-        from astropy.coordinates import SkyCoord
-        dat=pd.read_hdf(hdffile)
-        ra=dat["ra"]
-        dec=dat["dec"]
-        c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
-        phi=c.galactic.l.radian
-        theta=np.pi/2.0-c.galactic.b.radian
-        l=c.galactic.l.degree
-        b=c.galactic.b.degree
-        l[l>180]=l[l>180]-360
-        return np.array([theta,phi]),l,b
+    import pandas as pd
+    from astropy import units as u
+    from astropy.coordinates import SkyCoord
+    dat=pd.read_hdf(hdffile)
+    ra=dat["ra"]
+    dec=dat["dec"]
+    c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
+    phi=c.galactic.l.radian
+    theta=np.pi/2.0-c.galactic.b.radian
+    l=c.galactic.l.degree
+    b=c.galactic.b.degree
+    l[l>180]=l[l>180]-360
+    return np.array([theta,phi]),l,b
 
-    def test_inout_detector():
+def plot_targets(l,b,ans,outfile="map.png"):
+    import matplotlib.pyplot as plt
+    fig=plt.figure()
+    ax=fig.add_subplot(111,aspect=1.0)
+    plt.plot(l,b,".",alpha=0.03,color="gray")
+    plt.plot(l[ans],b[ans],".",alpha=0.1)
+    plt.title("N in Detector ="+str(len(b[ans]))+" Hw<12.5")
+    plt.xlabel("l (deg)")
+    plt.ylabel("b (deg)")
+    plt.gca().invert_xaxis()
+    plt.savefig(outfile)        
+    plt.show()
+
+if __name__ == "__main__":
+    import pkg_resources           
+    
+    def test_inout_detector(targets):
         """This is just test
 
         """
-        targets,l,b=read_jasmine_targets()
         each_width_mm=19.52
         width_mm=22.4
         EFL_mm=4370.0
         center=np.array([np.pi/2.0,0.0])
         PA=0.0
         ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-        return targets,ans,l,b
-
-    def plot_targets(l,b,ans,outfile="map.png"):
-        import matplotlib.pyplot as plt
-        fig=plt.figure()
-        ax=fig.add_subplot(111,aspect=1.0)
-        plt.plot(l,b,".",alpha=0.03,color="gray")
-        plt.plot(l[ans],b[ans],".",alpha=0.1)
-        plt.title("N in Detector ="+str(len(b[ans]))+" Hw<12.5")
-        plt.xlabel("l (deg)")
-        plt.ylabel("b (deg)")
-        plt.gca().invert_xaxis()
-        plt.savefig(outfile)        
-        plt.show()
+        return ans
 
 
-    targets,ans,l,b=test_inout_detector()
+    hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
+    targets,l,b=read_jasmine_targets(hdf)
+    ans=test_inout_detector(targets)
     line="# of stars in the detector="+str(np.sum(ans))
     plot_targets(l,b,ans)
     
