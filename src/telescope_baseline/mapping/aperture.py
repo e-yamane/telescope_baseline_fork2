@@ -146,31 +146,80 @@ def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_
 
 if __name__ == "__main__":
     
+
+    def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
+        """Read JASMINE catalog 
+        
+        Args:
+            hdffile: HDF (ra,dec, ...) 
+
+        Returns:
+            targets coordinate(in radian), l in deg, b in deg
+
+ 
+        Notes:
+            HDF file can be generated using jasmine_catalog, for instance, by the following example.
+
+        Examples:
+            
+            >>> import psycopg2 as sql
+            >>> import pandas as pd
+            >>> login = {
+            >>> 'host': 'localhost',
+            >>> 'port': 15432,
+            >>> 'database': 'jasmine',
+            >>> 'user': 'jasmine',
+            >>> 'password': 'jasmine',
+            >>> }
+            >>> query = "SELECT ra, dec, phot_hw_mag FROM merged_sources WHERE phot_hw_mag < 12.5;"
+            >>> connection = sql.connect(**login)
+            >>> dat = pd.read_sql(sql=query, con=connection)
+            >>> dat.to_hdf("cat.hdf", 'key', mode='w', complevel=5)
+
+        """
+        
+        import pandas as pd
+        from astropy import units as u
+        from astropy.coordinates import SkyCoord
+        dat=pd.read_hdf(hdffile)
+        ra=dat["ra"]
+        dec=dat["dec"]
+        c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
+        phi=c.galactic.l.radian
+        theta=np.pi/2.0-c.galactic.b.radian
+        l=c.galactic.l.degree
+        b=c.galactic.b.degree
+        l[l>180]=l[l>180]-360
+        return np.array([theta,phi]),l,b
+
     def test_inout_detector():
-        np.random.seed(1)
-        Ntarget=100000
-        targets=np.array([np.random.normal(loc=np.pi/2.0,scale=np.pi/100.0,size=Ntarget),np.random.normal(loc=0.0,scale=np.pi/100.0,size=Ntarget)])
+        """This is just test
+
+        """
+        targets,l,b=read_jasmine_targets()
         each_width_mm=19.52
         width_mm=22.4
         EFL_mm=4370.0
         center=np.array([np.pi/2.0,0.0])
         PA=0.0
         ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-        assert np.sum(ans)==1296
-        return targets,ans
+        return targets,ans,l,b
 
-    
-    targets,ans=test_inout_detector()
+    def plot_targets(l,b,ans,outfile="map.png"):
+        import matplotlib.pyplot as plt
+        fig=plt.figure()
+        ax=fig.add_subplot(111,aspect=1.0)
+        plt.plot(l,b,".",alpha=0.03,color="gray")
+        plt.plot(l[ans],b[ans],".",alpha=0.1)
+        plt.title("N in Detector ="+str(len(b[ans]))+" Hw<12.5")
+        plt.xlabel("l (deg)")
+        plt.ylabel("b (deg)")
+        plt.gca().invert_xaxis()
+        plt.savefig(outfile)        
+        plt.show()
+
+
+    targets,ans,l,b=test_inout_detector()
     line="# of stars in the detector="+str(np.sum(ans))
-    print(line)
+    plot_targets(l,b,ans)
     
-    import matplotlib.pyplot as plt
-    from healpy.visufunc import projscatter
-    import healpy as hp
-    Nside=16
-    emparr=np.zeros(hp.nside2npix(Nside))        
-    hp.orthview(emparr,cmap="bwr")
-    plt.title(line)
-    projscatter(targets,alpha=0.4,marker="+")
-    projscatter(targets[:,ans],alpha=0.4,marker="+")
-    plt.show()
