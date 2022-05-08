@@ -2,6 +2,33 @@ import numpy as np
 from telescope_baseline.mapping.pixelfunc import ang2vec, vec2ang
 
 
+def lb2ang(l,b):
+    """convert l and b to ang (theta in radian, phi in radian)
+    Args:
+       l: galactic coordinate l
+       b: galactic coordinate b
+    Returns:
+       ang (theta in radian, phi in radian)
+
+    """
+    phi=l/180.0*np.pi
+    theta=np.pi/2.0-b/180.0*np.pi
+    return np.array([theta,phi])
+
+def ang2lb(ang):
+    """convert ang (theta in radian, phi in radian) to l and b 
+    Args:
+       ang (theta in radian, phi in radian)
+    Returns:
+       l: galactic coordinate l
+       b: galactic coordinate b
+
+    """
+    theta, phi=ang
+    l=phi*180.0/np.pi
+    b=90.0 - theta*180.0/np.pi
+    return l, b
+    
 def basic_convex(center,PA,width,anglist,scale):
     """compute a single convex
     Args: 
@@ -43,15 +70,16 @@ def square_convex(center,PA,width):
     scale=1.0/np.sqrt(2.0)
     return basic_convex(center,PA,width,anglist,scale)
 
-def position_detector_unit(direction,scale,center,PA,width):
-    """compute a relative position in the unit of the detectir size from the original position center/PA/width
+def ang_detector_unit(direction,scale,center,PA,width):
+    """compute a relative ang position in the unit of the detectir size from the original position center/PA/width
     Args: 
         direction: TBLR =top,bottom,left,right
+        scale: scale in the detector one side unit
         center: theta, phi of the center
         PA: position angle of the detector (north up)
         width: detector width in radian
     Returns:
-        position in radian (phi,theta)
+        ang (theta, phi)
     
     """
 
@@ -61,7 +89,23 @@ def position_detector_unit(direction,scale,center,PA,width):
     i=dic[direction]
     return bc[:,i]
     
+def lb_detector_unit(direction,scale,l_center,b_center, PA_deg, width_mm=22.4, EFL_mm=4370.0):
+    """compute a relative l,b position in the unit of the detectir size from the original position center/PA/width
+    Args: 
+        direction: TBLR =top,bottom,left,right
+        scale: scale in the detector one side unit
+        l_center: center of galactic coordinate, l (deg)
+        b_center: center of galactic coordinate, b (deg)
+        PA_deg: position angle in deg
+        width_mm: the separation of detector chips
+        EFL_mm: effective focal length in the unit of mm
+    Returns:
+        l,b
+    
+    """
+    PA=PA_deg/180.0*np.pi
 
+    return ang2lb(ang_detector_unit(direction,scale,lb2ang(l_center,b_center),PA,width_mm/EFL_mm))
     
 def Roty(theta):
     return np.array([[np.cos(theta),0.0,np.sin(theta)],[0.0,1.0,0.0],[-np.sin(theta),0.0,np.cos(theta)]])
@@ -177,14 +221,12 @@ def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_m
         in = 1 or out = 0 mask
 
     """
-    phi=l_center/180.0*np.pi
-    theta=np.pi/2.0-b_center/180.0*np.pi
-    center=np.array([theta,phi])
+    center=lb2ang(l_center,b_center)
     PA=PA_deg/180.0*np.pi
     return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
 
-def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
-    """checking if targets are in or out Lshape formation
+def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
+    """checking if targets are in or out (extended) L shape formation
     
     Args:
         l_center: center of galactic coordinate, l (deg)
@@ -193,64 +235,59 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
         width_mm: the separation of detector chips
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
+        left: shift to left of the upper two fields 
+        top: shift to top of the upper two fields 
+
     Returns:
         in = 1 or out = 0 mask
 
     """
-    phi=l_center/180.0*np.pi
-    theta=np.pi/2.0-b_center/180.0*np.pi
-    center=np.array([theta,phi])
+    center=lb2ang(l_center,b_center)
     PA=PA_deg/180.0*np.pi
-
     width=width_mm/EFL_mm
     each_width=each_width_mm/EFL_mm
     
     ans=[]    
     ans.append(inout_four_sqaure_convexes(targets, center, PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("R",0.5,center,PA,width), PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("T",1.0,center,PA,width), PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("T",1.5,center,PA,width), PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("R",0.5,center,PA,width), PA, width, each_width))
+    pos=ang_detector_unit("L",left,center,PA,width)
+    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.0+top,pos,PA,width), PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.5+top,pos,PA,width), PA, width, each_width))
+        
     return ans
 
 if __name__ == "__main__":
     import pkg_resources           
     from telescope_baseline.mapping.read_catalog import read_jasmine_targets
     from telescope_baseline.mapping.plot_mapping import plot_targets
-
-    def test_inout_detector(targets):
-        """This is just test
-
-        """
-        each_width_mm=19.52
-        width_mm=22.4
-        EFL_mm=4370.0
-        l_center=-0.5
-        b_center=0.5
-        PA=30.0
-        ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-        assert np.sum(ans)==2091
-        return ans
-
-    def test_inout_Lshape(targets):
-        """This is just test
-
-        """
-        each_width_mm=19.52
-        width_mm=22.4
-        EFL_mm=4370.0
-        l_center=-0.5
-        b_center=0.0
-        PA=15.0
-        ans=inout_Lshape(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-        return ans
-
+    
+    each_width_mm=19.52
+    width_mm=22.4
+    EFL_mm=4370.0
+    l_center=-1.2
+    b_center=0.0
+    PA_deg=0.0
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-#    ans=test_inout_detector(targets)
-    ans=test_inout_Lshape(targets)
-    for ans_each in ans:
-            print("N in detector=",np.sum(ans_each))
-    print("N in L shape=",np.sum(np.max(ans,axis=0)))
+    #    ans=inout_detector(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+
+    #right L
+    ans=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
+
+    #mid L
+    l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)    
+    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
+    ans=np.vstack([ans,ans2])
+    
+    #left L
+    l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans=np.vstack([ans,ans2])
+
+    for i,ans_each in enumerate(ans):
+            print("N in "+str(i)+"-th map=",np.sum(ans_each))
+    print("N in total=",np.sum(np.max(ans,axis=0)))
     plot_targets(l,b,ans)
     
