@@ -194,11 +194,13 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
     
     convex=wide_square_convex(center,PA,width)
     cconvex=wide_square_convex(convex[:,3],PA,width)
+    ccconvex=wide_square_convex(cconvex[:,3],PA,width)
+    
     ans=[]    
     ans.append(inout_four_sqaure_convexes(targets, center, PA, width, each_width))
     ans.append(inout_four_sqaure_convexes(targets, convex[:,0], PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, convex[:,3], PA, width, each_width))
     ans.append(inout_four_sqaure_convexes(targets, cconvex[:,3], PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, ccconvex[:,3], PA, width, each_width))
 
     return ans
 
