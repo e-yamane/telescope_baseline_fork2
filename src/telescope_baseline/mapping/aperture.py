@@ -126,13 +126,13 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         answers = answers + ans 
     return answers
 
-def inout_detector(targets,l_center,b_center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
     """checking if targets are in or out four square convexes
     
     Args:
         l_center: center of galactic coordinate, l (deg)
         b_center: center of galactic coordinate, b (deg)
-        PA: position angle in radian
+        PA_deg: position angle in deg
         width_mm: the separation of detector chips
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
@@ -143,6 +143,7 @@ def inout_detector(targets,l_center,b_center,PA, width_mm=22.4, each_width_mm=19
     phi=l_center/180.0*np.pi
     theta=np.pi/2.0-b_center/180.0*np.pi
     center=np.array([theta,phi])
+    PA=PA_deg/180.0*np.pi
     return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
 
 
@@ -158,9 +159,9 @@ if __name__ == "__main__":
         each_width_mm=19.52
         width_mm=22.4
         EFL_mm=4370.0
-        l_center=0.5
-        b_center=-0.5
-        PA=0.0
+        l_center=-0.5
+        b_center=0.5
+        PA=30.0
         ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
         return ans
 
