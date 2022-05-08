@@ -1,3 +1,7 @@
+"""Example to count the number of the stars w/ Hw<12.5 by Kawata-san's basic mapping unit
+
+"""
+
 if __name__=="__main__":
     import pkg_resources
     import numpy as np
