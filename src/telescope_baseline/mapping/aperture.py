@@ -126,11 +126,12 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         answers = answers + ans 
     return answers
 
-def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+def inout_detector(targets,l_center,b_center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
     """checking if targets are in or out four square convexes
     
     Args:
-        center: theta, phi of the center in radian
+        l_center: center of galactic coordinate, l (deg)
+        b_center: center of galactic coordinate, b (deg)
         PA: position angle in radian
         width_mm: the separation of detector chips
         each_width_mm: the chip width in the unit of mm
@@ -139,70 +140,17 @@ def inout_detector(targets, center,PA, width_mm=22.4, each_width_mm=19.52,  EFL_
         in = 1 or out = 0 mask
 
     """
-    return inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,0.0]),0.0,width_mm/EFL_mm, each_width_mm/EFL_mm)
- 
+    phi=l_center/180.0*np.pi
+    theta=np.pi/2.0-b_center/180.0*np.pi
+    center=np.array([theta,phi])
+    return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
 
-def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
-    """Read JASMINE catalog 
-        
-        Args:
-            hdffile: HDF (ra,dec, ...) 
-
-        Returns:
-            targets coordinate(in radian), l in deg, b in deg
-
- 
-        Notes:
-            HDF file can be generated using jasmine_catalog, for instance, by the following example.
-
-        Examples:
-            
-            >>> import psycopg2 as sql
-            >>> import pandas as pd
-            >>> login = {
-            >>> 'host': 'localhost',
-            >>> 'port': 15432,
-            >>> 'database': 'jasmine',
-            >>> 'user': 'jasmine',
-            >>> 'password': 'jasmine',
-            >>> }
-            >>> query = "SELECT ra, dec, phot_hw_mag FROM merged_sources WHERE phot_hw_mag < 12.5;"
-            >>> connection = sql.connect(**login)
-            >>> dat = pd.read_sql(sql=query, con=connection)
-            >>> dat.to_hdf("cat.hdf", 'key', mode='w', complevel=5)
-
-    """
-        
-    import pandas as pd
-    from astropy import units as u
-    from astropy.coordinates import SkyCoord
-    dat=pd.read_hdf(hdffile)
-    ra=dat["ra"]
-    dec=dat["dec"]
-    c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
-    phi=c.galactic.l.radian
-    theta=np.pi/2.0-c.galactic.b.radian
-    l=c.galactic.l.degree
-    b=c.galactic.b.degree
-    l[l>180]=l[l>180]-360
-    return np.array([theta,phi]),l,b
-
-def plot_targets(l,b,ans,outfile="map.png"):
-    import matplotlib.pyplot as plt
-    fig=plt.figure()
-    ax=fig.add_subplot(111,aspect=1.0)
-    plt.plot(l,b,".",alpha=0.03,color="gray")
-    plt.plot(l[ans],b[ans],".",alpha=0.1)
-    plt.title("N in Detector ="+str(len(b[ans]))+" Hw<12.5")
-    plt.xlabel("l (deg)")
-    plt.ylabel("b (deg)")
-    plt.gca().invert_xaxis()
-    plt.savefig(outfile)        
-    plt.show()
 
 if __name__ == "__main__":
     import pkg_resources           
-    
+    from telescope_baseline.mapping.read_catalog import read_jasmine_targets
+    from telescope_baseline.mapping.plot_mapping import plot_targets
+
     def test_inout_detector(targets):
         """This is just test
 
@@ -210,9 +158,10 @@ if __name__ == "__main__":
         each_width_mm=19.52
         width_mm=22.4
         EFL_mm=4370.0
-        center=np.array([np.pi/2.0,0.0])
+        l_center=0.5
+        b_center=-0.5
         PA=0.0
-        ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+        ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
         return ans
 
 
