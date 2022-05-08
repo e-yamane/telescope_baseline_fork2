@@ -11,7 +11,6 @@ def plot_targets(l,b,ans,outfile="map.png"):
     else:
         for ans_each in ans:
             plt.plot(l[ans_each],b[ans_each],".",alpha=0.1)
-            print(np.sum(ans_each))
     plt.xlabel("l (deg)")
     plt.ylabel("b (deg)")
     plt.gca().invert_xaxis()

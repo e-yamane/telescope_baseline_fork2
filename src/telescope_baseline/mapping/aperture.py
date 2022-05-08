@@ -239,6 +239,8 @@ if __name__ == "__main__":
     targets,l,b=read_jasmine_targets(hdf)
 #    ans=test_inout_detector(targets)
     ans=test_inout_Lshape(targets)
-    line="# of stars in the detector="+str(np.sum(ans))
+    for ans_each in ans:
+            print("N in detector=",np.sum(ans_each))
+    print("N in L shape=",np.sum(np.max(ans,axis=0)))
     plot_targets(l,b,ans)
     
