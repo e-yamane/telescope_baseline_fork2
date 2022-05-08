@@ -47,23 +47,6 @@ def test_convex_on_sphere_map():
     ans=convex_on_sphere(angv,angw)
     assert (np.sum((ans - [0,1,0,1])**2)) == 0
 
-def test_square_convex_in():
-    from telescope_baseline.mapping.randomtarget import rantarget
-    np.random.seed(1)
-    targets=rantarget(N=100000)
-    ans=inout_single_square_covex(targets,np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,np.pi/4.0)
-    assert np.sum(ans)==3171
-    return targets,ans
-
-def test_four_square_convexes_in():
-    from telescope_baseline.mapping.randomtarget import rantarget
-    np.random.seed(1)
-    Ntarget=100000
-    fac=0.2
-    targets=rantarget(N=Ntarget)
-    ans=inout_four_sqaure_convexes(targets, np.array([np.pi/2.0,np.pi/2.0]),np.pi/3.0,fac*np.pi/4.0, fac*np.pi/4.0*0.8)
-    assert np.sum(ans)==270
-    return targets,ans
 
 def test_inout_detector():
     import pkg_resources           
