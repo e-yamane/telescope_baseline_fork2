@@ -1,5 +1,5 @@
 import numpy as np
-from pixelfunc import ang2vec, vec2ang
+from telescope_baseline.mapping.pixelfunc import ang2vec, vec2ang
 
 def square_convex(center,PA,width):
     """compute a single sqaure convex
