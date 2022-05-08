@@ -25,6 +25,30 @@ def square_convex(center,PA,width):
     Cang = vec2ang(C)
     return np.array(Cang)
 
+def wide_square_convex(center,PA,width):
+    """compute a single wide sqaure convex
+    Args: 
+        center: theta, phi of the center
+        PA: position angle of the detector (north up)
+        width: detector width in radian
+    Returns:
+        detecter convex (ang)
+    
+    """
+    
+    thetac,phic=center
+    ez=np.array([0.0,0.0,1.0])
+    half_diagonal_angle=width
+    e0=Roty(half_diagonal_angle)@ez
+    convex0=np.array([Rotz(-np.pi/2.0)@e0,Rotz(0.0)@e0,Rotz(np.pi/2.0)@e0,Rotz(np.pi)@e0])
+    #for i in range(0,4):
+    #    c=Rotz(phic)@Roty(thetac)@Rotz(PA)@convex0[i,:]
+    C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
+    C=np.einsum('ij,kj->ki',Roty(thetac),C)
+    C=np.einsum('ij,kj->ki',Rotz(phic),C)
+    Cang = vec2ang(C)
+    return np.array(Cang)
+
 
 def Roty(theta):
     return np.array([[np.cos(theta),0.0,np.sin(theta)],[0.0,1.0,0.0],[-np.sin(theta),0.0,np.cos(theta)]])
@@ -96,7 +120,7 @@ def inout_single_square_covex(targets,center,PA,width):
     """
     convex=square_convex(center,PA,width)
     ans=convex_on_sphere(convex,targets)
-    ans=np.array(ans,dtype=np.bool)
+    ans=np.array(ans,dtype=np.bool_)
     return ans
 
 
@@ -117,12 +141,12 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
     convex=np.array(convex)
     convexes=[]
     Ntarget=np.shape(targets)[1]
-    answers=np.zeros(Ntarget,dtype=np.bool)
+    answers=np.zeros(Ntarget,dtype=np.bool_)
     for i in range(0,4):
         each_convex=square_convex(convex[:,i],PA,each_width)
         convexes.append(each_convex)
         ans=convex_on_sphere(each_convex,targets)        
-        ans=np.array(ans,dtype=np.bool)
+        ans=np.array(ans,dtype=np.bool_)
         answers = answers + ans 
     return answers
 
@@ -146,6 +170,37 @@ def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_m
     PA=PA_deg/180.0*np.pi
     return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
 
+def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+    """checking if targets are in or out Lshape formation
+    
+    Args:
+        l_center: center of galactic coordinate, l (deg)
+        b_center: center of galactic coordinate, b (deg)
+        PA_deg: position angle in deg
+        width_mm: the separation of detector chips
+        each_width_mm: the chip width in the unit of mm
+        EFL_mm: effective focal length in the unit of mm
+    Returns:
+        in = 1 or out = 0 mask
+
+    """
+    phi=l_center/180.0*np.pi
+    theta=np.pi/2.0-b_center/180.0*np.pi
+    center=np.array([theta,phi])
+    PA=PA_deg/180.0*np.pi
+
+    width=width_mm/EFL_mm
+    each_width=each_width_mm/EFL_mm
+    
+    convex=wide_square_convex(center,PA,width)
+    cconvex=wide_square_convex(convex[:,3],PA,width)
+    ans=[]    
+    ans.append(inout_four_sqaure_convexes(targets, center, PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, convex[:,0], PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, convex[:,3], PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, cconvex[:,3], PA, width, each_width))
+
+    return ans
 
 if __name__ == "__main__":
     import pkg_resources           
@@ -163,12 +218,27 @@ if __name__ == "__main__":
         b_center=0.5
         PA=30.0
         ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+        assert np.sum(ans)==2091
+        return ans
+
+    def test_inout_Lshape(targets):
+        """This is just test
+
+        """
+        each_width_mm=19.52
+        width_mm=22.4
+        EFL_mm=4370.0
+        l_center=-0.5
+        b_center=0.0
+        PA=15.0
+        ans=inout_Lshape(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
         return ans
 
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-    ans=test_inout_detector(targets)
+#    ans=test_inout_detector(targets)
+    ans=test_inout_Lshape(targets)
     line="# of stars in the detector="+str(np.sum(ans))
     plot_targets(l,b,ans)
     
