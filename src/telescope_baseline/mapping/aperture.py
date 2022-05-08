@@ -1,6 +1,35 @@
 import numpy as np
 from telescope_baseline.mapping.pixelfunc import ang2vec, vec2ang
 
+
+def basic_convex(center,PA,width,anglist,scale):
+    """compute a single convex
+    Args: 
+        center: theta, phi of the center
+        PA: position angle of the detector (north up)
+        width: detector width in radian
+        anglist: angular position list of the convex
+        scale: scale of convex
+    Returns:
+        detecter convex (ang)
+    
+    """
+    
+    thetac,phic=center
+    ez=np.array([0.0,0.0,1.0])
+    half_diagonal_angle=width*scale
+    e0=Roty(half_diagonal_angle)@ez
+    convex0=[]
+    for ang in anglist:
+        convex0.append(Rotz(ang)@e0)
+    convex0=np.array(convex0)
+    C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
+    C=np.einsum('ij,kj->ki',Roty(thetac),C)
+    C=np.einsum('ij,kj->ki',Rotz(phic),C)
+    Cang = vec2ang(C)
+    return np.array(Cang)
+
+
 def square_convex(center,PA,width):
     """compute a single sqaure convex
     Args: 
@@ -11,19 +40,9 @@ def square_convex(center,PA,width):
         detecter convex (ang)
     
     """
-    
-    thetac,phic=center
-    ez=np.array([0.0,0.0,1.0])
-    half_diagonal_angle=width/np.sqrt(2.0)
-    e0=Roty(half_diagonal_angle)@ez
-    convex0=np.array([Rotz(-3.0*np.pi/4.0)@e0,Rotz(-np.pi/4.0)@e0,Rotz(np.pi/4.0)@e0,Rotz(3.0*np.pi/4.0)@e0])
-    #for i in range(0,4):
-    #    c=Rotz(phic)@Roty(thetac)@Rotz(PA)@convex0[i,:]
-    C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
-    C=np.einsum('ij,kj->ki',Roty(thetac),C)
-    C=np.einsum('ij,kj->ki',Rotz(phic),C)
-    Cang = vec2ang(C)
-    return np.array(Cang)
+    anglist=[-3.0*np.pi/4.0,-np.pi/4.0,np.pi/4.0,3.0*np.pi/4.0]
+    scale=1.0/np.sqrt(2.0)
+    return basic_convex(center,PA,width,anglist,scale)
 
 def wide_square_convex(center,PA,width):
     """compute a single wide sqaure convex
@@ -35,19 +54,9 @@ def wide_square_convex(center,PA,width):
         detecter convex (ang)
     
     """
-    
-    thetac,phic=center
-    ez=np.array([0.0,0.0,1.0])
-    half_diagonal_angle=width
-    e0=Roty(half_diagonal_angle)@ez
-    convex0=np.array([Rotz(-np.pi/2.0)@e0,Rotz(0.0)@e0,Rotz(np.pi/2.0)@e0,Rotz(np.pi)@e0])
-    #for i in range(0,4):
-    #    c=Rotz(phic)@Roty(thetac)@Rotz(PA)@convex0[i,:]
-    C=np.einsum('ij,kj->ki',Rotz(PA),convex0)
-    C=np.einsum('ij,kj->ki',Roty(thetac),C)
-    C=np.einsum('ij,kj->ki',Rotz(phic),C)
-    Cang = vec2ang(C)
-    return np.array(Cang)
+    anglist=[-np.pi/2.0,0.0,np.pi/2.0,np.pi]
+    scale=1.0
+    return basic_convex(center,PA,width,anglist,scale)
 
 
 def Roty(theta):
@@ -239,10 +248,10 @@ if __name__ == "__main__":
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-#    ans=test_inout_detector(targets)
-    ans=test_inout_Lshape(targets)
-    for ans_each in ans:
-            print("N in detector=",np.sum(ans_each))
-    print("N in L shape=",np.sum(np.max(ans,axis=0)))
+    ans=test_inout_detector(targets)
+#    ans=test_inout_Lshape(targets)
+#    for ans_each in ans:
+#            print("N in detector=",np.sum(ans_each))
+#    print("N in L shape=",np.sum(np.max(ans,axis=0)))
     plot_targets(l,b,ans)
     

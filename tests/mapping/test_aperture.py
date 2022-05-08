@@ -66,14 +66,17 @@ def test_four_square_convexes_in():
     return targets,ans
 
 def test_inout_detector():
-    np.random.seed(1)
-    Ntarget=100000
-    targets=np.array([np.random.normal(loc=np.pi/2.0,scale=np.pi/100.0,size=Ntarget),np.random.normal(loc=0.0,scale=np.pi/100.0,size=Ntarget)])
+    import pkg_resources           
+    from telescope_baseline.mapping.read_catalog import read_jasmine_targets
+    hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
+    targets,l,b=read_jasmine_targets(hdf)
     each_width_mm=19.52
     width_mm=22.4
     EFL_mm=4370.0
-    center=np.array([np.pi/2.0,0.0])
-    PA=0.0
-    ans=inout_detector(targets, center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-    assert np.sum(ans)==1296
-    return targets,ans
+    l_center=-0.5
+    b_center=0.5
+    PA=30.0
+    ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    assert np.sum(ans)==2091
+    return ans
+
