@@ -1,7 +1,5 @@
 import numpy as np
-from healpy.pixelfunc import ang2vec, vec2ang
-
-                         
+from pixelfunc import ang2vec, vec2ang
 
 def square_convex(center,PA,width):
     """compute a single sqaure convex
