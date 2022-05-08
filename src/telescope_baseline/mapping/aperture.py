@@ -29,7 +29,6 @@ def basic_convex(center,PA,width,anglist,scale):
     Cang = vec2ang(C)
     return np.array(Cang)
 
-
 def square_convex(center,PA,width):
     """compute a single sqaure convex
     Args: 
@@ -44,21 +43,26 @@ def square_convex(center,PA,width):
     scale=1.0/np.sqrt(2.0)
     return basic_convex(center,PA,width,anglist,scale)
 
-def wide_square_convex(center,PA,width):
-    """compute a single wide sqaure convex
+def position_detector_unit(direction,scale,center,PA,width):
+    """compute a relative position in the unit of the detectir size from the original position center/PA/width
     Args: 
+        direction: TBLR =top,bottom,left,right
         center: theta, phi of the center
         PA: position angle of the detector (north up)
         width: detector width in radian
     Returns:
-        detecter convex (ang)
+        position in radian (phi,theta)
     
     """
+
     anglist=[-np.pi/2.0,0.0,np.pi/2.0,np.pi]
-    scale=1.0
-    return basic_convex(center,PA,width,anglist,scale)
+    dic={"R":0,"B":1,"L":2,"T":3}
+    bc=basic_convex(center,PA,width,anglist,2*scale)
+    i=dic[direction]
+    return bc[:,i]
+    
 
-
+    
 def Roty(theta):
     return np.array([[np.cos(theta),0.0,np.sin(theta)],[0.0,1.0,0.0],[-np.sin(theta),0.0,np.cos(theta)]])
 
@@ -201,16 +205,11 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
     width=width_mm/EFL_mm
     each_width=each_width_mm/EFL_mm
     
-    convex=wide_square_convex(center,PA,width)
-    cconvex=wide_square_convex(convex[:,3],PA,width)
-    ccconvex=wide_square_convex(cconvex[:,3],PA,width)
-    
     ans=[]    
     ans.append(inout_four_sqaure_convexes(targets, center, PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, convex[:,0], PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, cconvex[:,3], PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, ccconvex[:,3], PA, width, each_width))
-
+    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("R",0.5,center,PA,width), PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("T",1.0,center,PA,width), PA, width, each_width))
+    ans.append(inout_four_sqaure_convexes(targets, position_detector_unit("T",1.5,center,PA,width), PA, width, each_width))
     return ans
 
 if __name__ == "__main__":
@@ -248,10 +247,10 @@ if __name__ == "__main__":
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-    ans=test_inout_detector(targets)
-#    ans=test_inout_Lshape(targets)
-#    for ans_each in ans:
-#            print("N in detector=",np.sum(ans_each))
-#    print("N in L shape=",np.sum(np.max(ans,axis=0)))
+#    ans=test_inout_detector(targets)
+    ans=test_inout_Lshape(targets)
+    for ans_each in ans:
+            print("N in detector=",np.sum(ans_each))
+    print("N in L shape=",np.sum(np.max(ans,axis=0)))
     plot_targets(l,b,ans)
     
