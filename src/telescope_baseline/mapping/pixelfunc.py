@@ -1,7 +1,7 @@
 """pixelfunc Borrowed from Healpy GPL-2.0 license, https://github.com/healpy/
 
 """
-
+import numpy as np
 def lonlat2thetaphi(lon, lat):
     """Transform longitude and latitude (deg) into co-latitude and longitude (rad)
     Args:
@@ -56,3 +56,9 @@ def ang2vec(theta, phi, lonlat=False):
     check_theta_valid(theta)
     sintheta = np.sin(theta)
     return np.array([sintheta * np.cos(phi), sintheta * np.sin(phi), np.cos(theta)]).T
+
+def check_theta_valid(theta):
+    """Raises exception if theta is not within 0 and pi"""
+    theta = np.asarray(theta)
+    if not ((theta >= 0).all() and (theta <= np.pi + 1e-5).all()):
+        raise ValueError("THETA is out of range [0,pi]")
