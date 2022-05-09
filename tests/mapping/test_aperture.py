@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes, inout_detector
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, inout_convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes, inout_detector
 from telescope_baseline.mapping.pixelfunc import vec2ang
 import numpy as np
 import pytest
@@ -16,7 +16,7 @@ def test_vec2ring():
     assert np.sum(vec2ring(a)[1,0,:]) == 1*3
     assert np.sum(vec2ring(a)[1,1,:]) == 2*3
 
-def test_convex_on_sphere():
+def test_inout_convex_on_sphere():
     ex=np.array([1,0,0])
     ey=np.array([0,1,0])
     ea=np.array([0,1.0/np.sqrt(2.0),1.0/np.sqrt(2.0)])
@@ -26,13 +26,13 @@ def test_convex_on_sphere():
     
     w=np.array([0,0,1])
     angw=np.array(vec2ang(w)).T[0] # (Nvertex, theta-phi)
-    assert convex_on_sphere(angv,angw)==0
+    assert inout_convex_on_sphere(angv,angw)==0
 
     w=np.array([1/np.sqrt(2.0),1/np.sqrt(2.0),1/np.sqrt(4.0)])
     angw=np.array(vec2ang(w)).T[0] 
-    assert convex_on_sphere(angv,angw)==1
+    assert inout_convex_on_sphere(angv,angw)==1
 
-def test_convex_on_sphere_map():
+def test_inout_convex_on_sphere_map():
     ex=np.array([1,0,0])
     ey=np.array([0,1,0])
     ea=np.array([0,1.0/np.sqrt(2.0),1.0/np.sqrt(2.0)])
@@ -44,7 +44,7 @@ def test_convex_on_sphere_map():
     q=np.array([1/np.sqrt(2.0),1/np.sqrt(2.0),1/np.sqrt(4.0)])
     v=np.array([w,q,w,q])
     angw=np.array(vec2ang(v))
-    ans=convex_on_sphere(angv,angw)
+    ans=inout_convex_on_sphere(angv,angw)
     assert (np.sum((ans - [0,1,0,1])**2)) == 0
 
 

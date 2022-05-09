@@ -143,23 +143,19 @@ def cos_angle_from_normal_vectorAB(a,b,x):
     return (x@np.cross(a,b).T).T
 
 
-def convex_on_sphere(angv,angw):
-    """checking if the points 
+def inout_convex_on_sphere(convex_ang,target_ang):
+    """checking if the target points  are in or out of convex 
     Args:
-        angv: list of theta,phi points that defines the convex on a sphere
-        angw: theta,phi lists in or out of the convex on a sphere
+        convex_ang: list of theta,phi points that defines the convex on a sphere
+        target_ang: theta,phi target lists in or out of the convex on a sphere
 
     Returns:
         1 (in convex) or 0 (out of convex)
     """
-    v=ang2vec(angv[0],angv[1])
-    w=ang2vec(angw[0],angw[1])
+    v=ang2vec(convex_ang[0],convex_ang[1])
+    w=ang2vec(target_ang[0],target_ang[1])
     Nvertex,Ncoordinate=np.shape(v)
     ring=vec2ring(v)
-    #cosa=[]
-    #for i in range(0,Nvertex):
-    #    cosa.append(cos_angle_from_normal_vectorAB(ring[i,0,:],ring[i,1,:],w))
-    #cosa = np.array(cosa)
     cosa=cos_angle_from_normal_vectorAB(ring[:,0,:],ring[:,1,:],w)
     mask=(cosa>=0.0)*(cosa<=1.0)
     return np.prod(mask,axis=0)
@@ -176,7 +172,7 @@ def inout_single_square_covex(targets,center,PA,width):
         in = 1 or out = 0 mask
     """
     convex=square_convex(center,PA,width)
-    ans=convex_on_sphere(convex,targets)
+    ans=inout_convex_on_sphere(convex,targets)
     ans=np.array(ans,dtype=np.bool_)
     return ans
 
@@ -202,7 +198,7 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
     for i in range(0,4):
         each_convex=square_convex(convex[:,i],PA,each_width)
         convexes.append(each_convex)
-        ans=convex_on_sphere(each_convex,targets)        
+        ans=inout_convex_on_sphere(each_convex,targets)        
         ans=np.array(ans,dtype=np.bool_)
         answers = answers + ans 
     return answers
