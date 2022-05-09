@@ -45,8 +45,4 @@ def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
     l[l>180]=l[l>180]-360
     return np.array([theta,phi]),l,b
 
-if __name__=="__main__":
-    import pkg_resources           
-    hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
-    targets,l,b=read_jasmine_targets(hdf)
 
