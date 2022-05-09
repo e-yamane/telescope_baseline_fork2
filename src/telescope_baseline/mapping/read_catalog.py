@@ -35,8 +35,8 @@ def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
     """
         
     dat=pd.read_hdf(hdffile)
-    ra=dat["ra"]
-    dec=dat["dec"]
+    ra=dat["ra"].values
+    dec=dat["dec"].values
     c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
     phi=c.galactic.l.radian
     theta=np.pi/2.0-c.galactic.b.radian
@@ -44,3 +44,9 @@ def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
     b=c.galactic.b.degree
     l[l>180]=l[l>180]-360
     return np.array([theta,phi]),l,b
+
+if __name__=="__main__":
+    import pkg_resources           
+    hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
+    targets,l,b=read_jasmine_targets(hdf)
+
