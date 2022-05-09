@@ -37,7 +37,7 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
     ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.5+top,pos,PA,width), PA, width, each_width))    
     return ans
 
-def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
     """in or out large frame
 
     Args:
@@ -48,12 +48,17 @@ def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_widt
         width_mm: the separation of detector chips
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
+        left: shift to left of the upper two fields 
+        top: shift to top of the upper two fields 
 
     Returns:
         inout mask sequence of inout mask of four detectors (in = 1 or out = 0 mask)
 
     """
-
+    #shift
+    l_center,b_center=lb_detector_unit("L",left,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    l_center,b_center=lb_detector_unit("T",top,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    
     #right L
     ans=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
     #mid L
@@ -82,9 +87,10 @@ if __name__ == "__main__":
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-    #    ans=inout_detector(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-
     ans=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans=np.vstack([ans,ans2])
+
     for i,ans_each in enumerate(ans):
             print("N in "+str(i)+"-th map=",np.sum(ans_each))
     print("N in total=",np.sum(np.max(ans,axis=0)))
