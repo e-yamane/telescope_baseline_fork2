@@ -169,7 +169,7 @@ def inout_single_square_covex(targets,center,PA,width):
         width: square width
 
     Returns:
-        in = 1 or out = 0 mask
+        inout mask of four detectors (in = 1 or out = 0 mask)
     """
     convex=square_convex(center,PA,width)
     ans=inout_convex_on_sphere(convex,targets)
@@ -187,7 +187,7 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         each_width: square width
 
     Returns:
-        in = 1 or out = 0 mask
+        inout mask of four detectors (in = 1 or out = 0 mask)
 
     """    
     convex=square_convex(center,PA,width)
@@ -214,76 +214,10 @@ def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_m
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
     Returns:
-        in = 1 or out = 0 mask
+        inout mask of four detectors (in = 1 or out = 0 mask)
 
     """
     center=lb2ang(l_center,b_center)
     PA=PA_deg/180.0*np.pi
     return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
 
-def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
-    """checking if targets are in or out (extended) L shape formation
-    
-    Args:
-        l_center: center of galactic coordinate, l (deg)
-        b_center: center of galactic coordinate, b (deg)
-        PA_deg: position angle in deg
-        width_mm: the separation of detector chips
-        each_width_mm: the chip width in the unit of mm
-        EFL_mm: effective focal length in the unit of mm
-        left: shift to left of the upper two fields 
-        top: shift to top of the upper two fields 
-
-    Returns:
-        in = 1 or out = 0 mask
-
-    """
-    center=lb2ang(l_center,b_center)
-    PA=PA_deg/180.0*np.pi
-    width=width_mm/EFL_mm
-    each_width=each_width_mm/EFL_mm
-    
-    ans=[]    
-    ans.append(inout_four_sqaure_convexes(targets, center, PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("R",0.5,center,PA,width), PA, width, each_width))
-    pos=ang_detector_unit("L",left,center,PA,width)
-    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.0+top,pos,PA,width), PA, width, each_width))
-    ans.append(inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.5+top,pos,PA,width), PA, width, each_width))
-        
-    return ans
-
-if __name__ == "__main__":
-    import pkg_resources           
-    from telescope_baseline.mapping.read_catalog import read_jasmine_targets
-    from telescope_baseline.mapping.plot_mapping import plot_targets
-    
-    each_width_mm=19.52
-    width_mm=22.4
-    EFL_mm=4370.0
-    l_center=-1.2
-    b_center=0.0
-    PA_deg=0.0
-
-    hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
-    targets,l,b=read_jasmine_targets(hdf)
-    #    ans=inout_detector(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-
-    #right L
-    ans=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
-
-    #mid L
-    l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)    
-    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
-    ans=np.vstack([ans,ans2])
-    
-    #left L
-    l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-    ans=np.vstack([ans,ans2])
-
-    for i,ans_each in enumerate(ans):
-            print("N in "+str(i)+"-th map=",np.sum(ans_each))
-    print("N in total=",np.sum(np.max(ans,axis=0)))
-    plot_targets(l,b,ans)
-    

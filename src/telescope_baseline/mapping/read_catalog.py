@@ -10,7 +10,7 @@ def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
             hdffile: HDF (ra,dec, ...) 
 
         Returns:
-            targets coordinate(in radian), l in deg, b in deg
+            targets coordinate list (in radian), l in deg, b in deg
 
  
         Notes:
