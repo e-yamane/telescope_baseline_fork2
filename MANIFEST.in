@@ -1,3 +1,8 @@
+include src/telescope_baseline/data/tel.json
+include src/telescope_baseline/data/teleff.json
+include src/telescope_baseline/data/teleffp.json
+include src/telescope_baseline/data/filter/filter*.json
+include src/telescope_baseline/data/qe/qe*.json
 include src/telescope_baseline/data/mag.list
 include src/telescope_baseline/data/filter/H_filter.dat
 include src/telescope_baseline/data/filter/J_filter.dat
