@@ -73,10 +73,34 @@ def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_widt
 
     return ans
 
+def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+    """number of observed for MPSv1
+
+    Args:
+        targats: targets coordinate list (in radian)
+        l_center: center of galactic coordinate, l (deg)
+        b_center: center of galactic coordinate, b (deg)
+        PA_deg: position angle in deg
+        width_mm: the separation of detector chips
+        each_width_mm: the chip width in the unit of mm
+        EFL_mm: effective focal length in the unit of mm
+
+    Returns:
+        number of observation
+    """
+    ans1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=-0.125/2.0)
+    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=-0.125/2.0)
+    ans3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=0.125/2.0)
+    ans4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=0.125/2.0)
+
+    ans=np.vstack([ans1,ans2,ans3,ans4])
+    nans=np.sum(ans,axis=0)
+    return nans
+
 if __name__ == "__main__":
     import pkg_resources           
     from telescope_baseline.mapping.read_catalog import read_jasmine_targets
-    from telescope_baseline.mapping.plot_mapping import plot_targets
+    from telescope_baseline.mapping.plot_mapping import plot_targets, plot_n_targets, hist_n_targets
     
     each_width_mm=19.52
     width_mm=22.4
@@ -87,46 +111,8 @@ if __name__ == "__main__":
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-    ans1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=-0.125/2.0)
-    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=-0.125/2.0)
-    ans3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=0.125/2.0)
-    ans4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=0.125/2.0)
-
-    ans=np.vstack([ans1,ans2,ans3,ans4])
-    for i,ans_each in enumerate(ans):
-            print("N in "+str(i)+"-th map=",np.sum(ans_each))
-    print("N in total=",np.sum(np.max(ans,axis=0)))
-#    plot_targets(l,b,ans)
-    
-    import matplotlib.pyplot as plt
-    import numpy as np
-    
-    def plot_n_targets(l,b,nans,outfile="nmap.png"):
-        fig=plt.figure()
-        ax=fig.add_subplot(111,aspect=1.0)
-        cb=plt.scatter(l,b,c=nans,alpha=0.1,cmap="CMRmap")
-        plt.colorbar(cb)
-        plt.xlabel("l (deg)")
-        plt.ylabel("b (deg)")
-        plt.gca().invert_xaxis()
-        plt.savefig(outfile)        
-        plt.show()
-
-    def hist_n_targets(nans,scale,outfile="nhist.png"):
-        nans=nans[nans>0]
-        orign=np.max(nans)
-        nans=nans*scale
-        fig=plt.figure()
-        ax=fig.add_subplot(111)
-        cb=plt.hist(nans, bins=orign, alpha=0.5, ec='navy', range=(0.5*scale, np.max(nans)+0.5*scale))
-        plt.xlabel("N")
-        plt.ylabel("number of the targets")
-        plt.savefig(outfile)        
-        plt.show()
-
-        
-    nans=np.sum(ans,axis=0)
-    print(np.max(nans),np.min(nans))
+    nans=obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+            
     scale=50.0*6000/12.0
     hist_n_targets(nans,scale)
     plot_n_targets(l,b,nans*scale)
