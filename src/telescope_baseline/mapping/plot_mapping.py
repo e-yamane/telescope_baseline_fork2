@@ -10,7 +10,7 @@ def plot_targets(l,b,ans,outfile="map.png"):
         plt.title("N in Detector ="+str(len(b[ans]))+" Hw<12.5")
     else:
         for ans_each in ans:
-            plt.plot(l[ans_each],b[ans_each],".",alpha=0.1)
+            plt.plot(l[ans_each],b[ans_each],".",alpha=0.05,color="C3")
     plt.xlabel("l (deg)")
     plt.ylabel("b (deg)")
     plt.gca().invert_xaxis()

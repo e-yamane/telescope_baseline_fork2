@@ -87,13 +87,48 @@ if __name__ == "__main__":
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
     targets,l,b=read_jasmine_targets(hdf)
-    ans=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-    ans=np.vstack([ans,ans2])
+    ans1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=-0.125/2.0)
+    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=-0.125/2.0)
+    ans3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=0.125/2.0)
+    ans4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=0.125/2.0)
 
+    ans=np.vstack([ans1,ans2,ans3,ans4])
     for i,ans_each in enumerate(ans):
             print("N in "+str(i)+"-th map=",np.sum(ans_each))
     print("N in total=",np.sum(np.max(ans,axis=0)))
-    plot_targets(l,b,ans)
+#    plot_targets(l,b,ans)
     
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    def plot_n_targets(l,b,nans,outfile="nmap.png"):
+        fig=plt.figure()
+        ax=fig.add_subplot(111,aspect=1.0)
+        cb=plt.scatter(l,b,c=nans,alpha=0.1,cmap="CMRmap")
+        plt.colorbar(cb)
+        plt.xlabel("l (deg)")
+        plt.ylabel("b (deg)")
+        plt.gca().invert_xaxis()
+        plt.savefig(outfile)        
+        plt.show()
 
+    def hist_n_targets(nans,scale,outfile="nhist.png"):
+        nans=nans[nans>0]
+        orign=np.max(nans)
+        nans=nans*scale
+        fig=plt.figure()
+        ax=fig.add_subplot(111)
+        cb=plt.hist(nans, bins=orign, alpha=0.5, ec='navy', range=(0.5*scale, np.max(nans)+0.5*scale))
+        plt.xlabel("N")
+        plt.ylabel("number of the targets")
+        plt.savefig(outfile)        
+        plt.show()
+
+        
+    nans=np.sum(ans,axis=0)
+    print(np.max(nans),np.min(nans))
+    scale=50.0*6000/12.0
+    hist_n_targets(nans,scale)
+    plot_n_targets(l,b,nans*scale)
+
+    
