@@ -30,7 +30,7 @@ def vec2ang(vectors, lonlat=False):
           the vector(s) to convert, shape is (3,) or (N, 3)
         lonlat : bool, optional, If True, return angles will be longitude and latitude in degree, otherwise, angles will be co-latitude and longitude in radians (default)
     Returns:
-        theta, phi : float, tuple of two arrays. the colatitude and longitude in radians
+        theta, phi : float, tuple of two arrays. the co-latitude and longitude in radians
     """
     vectors = vectors.reshape(-1, 3)
     dnorm = np.sqrt(np.sum(np.square(vectors), axis=1))
@@ -45,7 +45,7 @@ def vec2ang(vectors, lonlat=False):
 def ang2vec(theta, phi, lonlat=False):
     """ang2vec : convert angles to 3D position vector, Borrowed from Healpy GPL-2.0 license, https://github.com/healpy/
     Args:
-        theta : float, scalar or arry-like, colatitude in radians measured southward from north pole (in [0,pi]).
+        theta : float, scalar or arry-like, co-latitude in radians measured southward from north pole (in [0,pi]).
         phi : float, scalar or array-like. longitude in radians measured eastward (in [0, 2*pi]).
         lonlat : bool, If True, input angles are assumed to be longitude and latitude in degree, otherwise, they are co-latitude and longitude in radians.
     Returns:
@@ -61,4 +61,4 @@ def check_theta_valid(theta):
     """Raises exception if theta is not within 0 and pi"""
     theta = np.asarray(theta)
     if not ((theta >= 0).all() and (theta <= np.pi + 1e-5).all()):
-        raise ValueError("THETA is out of range [0,pi]")
+        raise ValueError("THETA is out of range [0,pi]: theta="+str(theta))

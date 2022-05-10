@@ -3,7 +3,7 @@ import pandas as pd
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-def read_jasmine_targets(hdffile="../../../data/cat.hdf"):
+def read_jasmine_targets(hdffile):
     """Read JASMINE catalog 
         
         Args:

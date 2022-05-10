@@ -5,7 +5,8 @@
 if __name__=="__main__":
     import pkg_resources
     import numpy as np
-    from telescope_baseline.mapping.aperture import inout_Lshape, lb_detector_unit
+    from telescope_baseline.mapping.aperture import lb_detector_unit
+    from telescope_baseline.mapping.mapset import inout_Lshape
     from telescope_baseline.mapping.read_catalog import read_jasmine_targets
     from telescope_baseline.mapping.plot_mapping import plot_targets
     

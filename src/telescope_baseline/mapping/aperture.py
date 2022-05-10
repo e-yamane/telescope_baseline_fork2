@@ -8,7 +8,7 @@ def lb2ang(l,b):
        l: galactic coordinate l
        b: galactic coordinate b
     Returns:
-       ang (theta in radian, phi in radian)
+       ang (co-latitude=theta in radian, longitude=phi in radian)
 
     """
     phi=l/180.0*np.pi
@@ -18,7 +18,7 @@ def lb2ang(l,b):
 def ang2lb(ang):
     """convert ang (theta in radian, phi in radian) to l and b 
     Args:
-       ang (theta in radian, phi in radian)
+       ang (co-latitude=theta in radian, longitude=phi in radian)
     Returns:
        l: galactic coordinate l
        b: galactic coordinate b
@@ -124,7 +124,7 @@ def vec2ring(x):
     """
     Nvertex, Ncoordinate=np.shape(x)
     if Nvertex%2 == 1:
-        print("Nvertex needs to be even")
+        raise ValueError("Nvertex needs to be even.")
     rs=(int(Nvertex/2),2,Ncoordinate)
     x1=x.reshape(rs) 
     x0=np.roll(x,1,axis=0).reshape(rs)
