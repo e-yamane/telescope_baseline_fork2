@@ -17,11 +17,12 @@ def plot_targets(l,b,ans,outfile="map.png"):
     plt.savefig(outfile)        
     plt.show()
 
-def plot_n_targets(l,b,nans,outfile="nmap.png"):
+def plot_n_targets(l,b,nans,outfile="nmap.png",cmap="CMRmap"):
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
-    cb=ax.scatter(l,b,c=nans,alpha=0.1,cmap="CMRmap")
-    plt.colorbar(cb)
+    cb=ax.scatter(l,b,c=nans,alpha=0.1,cmap=cmap)
+    ax.set_facecolor('gray')
+    plt.colorbar(cb,shrink=0.5)
     ax.set_xlabel("l (deg)")
     ax.set_ylabel("b (deg)")
     plt.gca().invert_xaxis()
