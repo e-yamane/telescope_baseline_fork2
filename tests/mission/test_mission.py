@@ -1,7 +1,7 @@
 import math
 
 import pytest
-from tools.mission.parameters import Parameters
+from telescope_baseline.tools.mission.parameters import Parameters
 
 
 def test_singleton():
