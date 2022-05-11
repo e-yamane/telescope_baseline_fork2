@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import math
-import threading
 
 
 class Parameters:
@@ -9,6 +8,7 @@ class Parameters:
     The parameter holder class Parameters is implemented in Singleton pattern (see. GoF book).
     Below properties are defined.
 
+    Properties:
     Only getter is implemented without attribute:
         telescope_through_put, total_efficiency, orbital_period, earth_mu, earth_c1, earth_c2, inclination
 
@@ -25,17 +25,24 @@ class Parameters:
     Not implemented yet
         saturation time, ltan
 
+    Known problem:
+        Thread safety is not guaranteed.
+
     """
     __instance = None
-    __lock = threading.Lock()
 
-    def __new__(cls):
-        with cls.__lock:
-            if cls.__instance is None:
-                cls.__instance = super().__new__(cls)
-        return cls.__instance
+
+    @staticmethod
+    def get_instance():
+        if Parameters.__instance is None:
+            Parameters()
+        return Parameters.__instance
 
     def __init__(self):
+        if Parameters.__instance is None:
+            Parameters.__instance = self
+        else:
+            raise Exception("Singleton Class")
         self.__EARTH_MASS = 5.9724E24  # kg
         self.__CONST_OF_GRAVITATION = 6.6743E-11  # meter^3 kg^-1 s^-2
         self.__EQUATORIAL_EARTH_RADIUS = 6.3781E6  # meter
@@ -285,8 +292,3 @@ class Parameters:
     def inclination(self):
         return math.acos(self.earth_c2 * math.pow((self.__EQUATORIAL_EARTH_RADIUS + self.__orbital_height) / 1000, 3.5)
                          * math.pow(1 - self.orbital_eccentricity * self.orbital_eccentricity, 2) * math.sqrt(1000))
-
-
-one = Parameters()
-print(one.inclination)
-print(one.orbital_period)
