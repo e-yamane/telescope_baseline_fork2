@@ -73,7 +73,7 @@ def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_widt
 
     return ans
 
-def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
+def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
     """number of observed for MPSv1
 
     Args:
@@ -84,14 +84,16 @@ def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19
         width_mm: the separation of detector chips
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
+        left: shift to left of the upper two fields 
+        top: shift to top of the upper two fields 
 
     Returns:
         number of observation
     """
-    ans1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=-0.125/2.0)
-    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=-0.125/2.0)
-    ans3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125,top=0.125/2.0)
-    ans4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125,top=0.125/2.0)
+    ans1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=-0.125/2.0+top)
+    ans2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=-0.125/2.0+top)
+    ans3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=0.125/2.0+top)
+    ans4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=0.125/2.0+top)
 
     ans=np.vstack([ans1,ans2,ans3,ans4])
     nans=np.sum(ans,axis=0)

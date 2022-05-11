@@ -37,7 +37,7 @@ def read_jasmine_targets(hdffile):
     dat=pd.read_hdf(hdffile)
     ra=dat["ra"].values
     dec=dat["dec"].values
-    hw=dat["phot_hw_mag"]
+    hw=dat["phot_hw_mag"].values
     c = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
     phi=c.galactic.l.radian
     theta=np.pi/2.0-c.galactic.b.radian
