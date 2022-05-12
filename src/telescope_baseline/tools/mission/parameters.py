@@ -42,7 +42,7 @@ class Parameters:
         if Parameters.__instance is None:
             Parameters.__instance = self
         else:
-            raise Exception("Singleton Class")
+            raise Exception("Parameters is already instantiated.")
         self.__EARTH_MASS = 5.9724E24  # kg
         self.__CONST_OF_GRAVITATION = 6.6743E-11  # meter^3 kg^-1 s^-2
         self.__EQUATORIAL_EARTH_RADIUS = 6.3781E6  # meter
@@ -83,7 +83,8 @@ class Parameters:
     @aperture_diameter.setter
     def aperture_diameter(self, value):
         if value < self.__aperture_inner_diameter:
-            raise Exception('diameter value is smaller than inner diameter.')
+            raise ValueError('diameter value ' + str(value) + ' is smaller than inner diameter '
+                            + str(self.__aperture_inner_diameter) + '.')
         self.__aperture_diameter = value
 
     @property
@@ -93,7 +94,8 @@ class Parameters:
     @aperture_inner_diameter.setter
     def aperture_inner_diameter(self, value):
         if value > self.__aperture_diameter:
-            raise Exception('inner diameter value is larger than diameter.')
+            raise ValueError('inner diameter value ' + str(value) + ' is larger than diameter '
+                            + str(self.__aperture_diameter) + '.')
         self.__aperture_inner_diameter = value
 
     @property
@@ -123,7 +125,7 @@ class Parameters:
     @full_well_electron.setter
     def full_well_electron(self, value):
         if value < 0:
-            raise Exception('full well electron should be positive.')
+            raise ValueError('full well electron should be positive.')
         self.__full_well_electron = value
 
     @property
@@ -141,7 +143,7 @@ class Parameters:
     @quantum_efficiency.setter
     def quantum_efficiency(self, value):
         if not 0 <= value <= 1:
-            raise Exception('Quantum Efficiency should be between 0 and 1.')
+            raise ValueError('Quantum Efficiency should be between 0 and 1.')
         self.__quantum_efficiency = value
 
     @property
@@ -151,7 +153,7 @@ class Parameters:
     @attitude_control_error.setter
     def attitude_control_error(self, value):
         if value < 0:
-            raise Exception('Attitude Control Error should be positive.')
+            raise ValueError('Attitude Control Error should be positive.')
         self.__attitude_control_error = value
 
     @property
