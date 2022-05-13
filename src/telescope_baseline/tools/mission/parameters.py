@@ -80,8 +80,7 @@ class Parameters:
     def aperture_diameter(self):
         return self.__aperture_diameter
 
-    @aperture_diameter.setter
-    def aperture_diameter(self, value):
+    def set_aperture_diameter(self, value):
         if value < self.__aperture_inner_diameter:
             raise ValueError('diameter value ' + str(value) + ' is smaller than inner diameter '
                             + str(self.__aperture_inner_diameter) + '.')
@@ -91,8 +90,7 @@ class Parameters:
     def aperture_inner_diameter(self):
         return self.__aperture_inner_diameter
 
-    @aperture_inner_diameter.setter
-    def aperture_inner_diameter(self, value):
+    def set_aperture_inner_diameter(self, value):
         if value > self.__aperture_diameter:
             raise ValueError('inner diameter value ' + str(value) + ' is larger than diameter '
                             + str(self.__aperture_diameter) + '.')
@@ -102,8 +100,7 @@ class Parameters:
     def focal_length(self):
         return self.__focal_length
 
-    @focal_length.setter
-    def focal_length(self, value):
+    def set_focal_length(self, value):
         self.__focal_length = value
 
     @property
@@ -122,8 +119,7 @@ class Parameters:
     def full_well_electron(self):
         return self.__full_well_electron
 
-    @full_well_electron.setter
-    def full_well_electron(self, value):
+    def set_full_well_electron(self, value):
         if value < 0:
             raise ValueError('full well electron should be positive.')
         self.__full_well_electron = value
@@ -132,16 +128,14 @@ class Parameters:
     def saturation_magnitude(self):
         return self.__saturation_magnitude
 
-    @saturation_magnitude.setter
-    def saturation_magnitude(self, value):
+    def set_saturation_magnitude(self, value):
         self.__saturation_magnitude = value
 
     @property
     def quantum_efficiency(self):
         return self.__quantum_efficiency
 
-    @quantum_efficiency.setter
-    def quantum_efficiency(self, value):
+    def set_quantum_efficiency(self, value):
         if not 0 <= value <= 1:
             raise ValueError('Quantum Efficiency should be between 0 and 1.')
         self.__quantum_efficiency = value
@@ -150,8 +144,7 @@ class Parameters:
     def attitude_control_error(self):
         return self.__attitude_control_error
 
-    @attitude_control_error.setter
-    def attitude_control_error(self, value):
+    def set_attitude_control_error(self, value):
         if value < 0:
             raise ValueError('Attitude Control Error should be positive.')
         self.__attitude_control_error = value
@@ -160,40 +153,35 @@ class Parameters:
     def high_wavelength_limit(self):
         return self.__high_wavelength_limit
 
-    @high_wavelength_limit.setter
-    def high_wavelength_limit(self, value):
+    def set_high_wavelength_limit(self, value):
         self.__high_wavelength_limit = value
 
     @property
     def low_wavelength_limit(self):
         return self.__low_wavelength_limit
 
-    @low_wavelength_limit.setter
-    def low_wavelength_limit(self, value):
+    def set_low_wavelength_limit(self, value):
         self.__low_wavelength_limit = value
 
     @property
     def filter_efficiency(self):
         return self.__filter_efficiency
 
-    @filter_efficiency.setter
-    def filter_efficiency(self, value):
+    def set_filter_efficiency(self, value):
         self.__filter_efficiency = value
 
     @property
     def one_mirror_efficiency(self):
         return self.__one_mirror_efficiency
 
-    @one_mirror_efficiency.setter
-    def one_mirror_efficiency(self, value):
+    def set_one_mirror_efficiency(self, value):
         self.__one_mirror_efficiency = value
 
     @property
     def number_of_mirrors(self):
         return self.__number_of_mirrors
 
-    @number_of_mirrors.setter
-    def number_of_mirrors(self, value):
+    def set_number_of_mirrors(self, value):
         self.__number_of_mirrors = value
 
     @property
@@ -208,24 +196,21 @@ class Parameters:
     def read_out_noise(self):
         return self.__read_out_noise
 
-    @read_out_noise.setter
-    def read_out_noise(self, value):
+    def set_read_out_noise(self, value):
         self.__read_out_noise = value
 
     @property
     def dark_current(self):
         return self.__dark_current
 
-    @dark_current.setter
-    def dark_current(self, value):
+    def set_dark_current(self, value):
         self.__dark_current = value
 
     @property
     def galactic_center_photon_flux(self):
         return self.__galactic_center_photon_flux
 
-    @galactic_center_photon_flux.setter
-    def galactic_center_photon_flux(self, value):
+    def set_galactic_center_photon_flux(self, value):
         self.__galactic_center_photon_flux = value
 
     @property
@@ -248,24 +233,21 @@ class Parameters:
     def standard_magnitude(self):
         return self.__standard_magnitude
 
-    @standard_magnitude.setter
-    def standard_magnitude(self, value):
+    def set_standard_magnitude(self, value):
         self.__standard_magnitude = value
 
     @property
     def faint_end_magnitude(self):
         return self.__faint_end_magnitude
 
-    @faint_end_magnitude.setter
-    def faint_end_magnitude(self, value):
+    def set_faint_end_magnitude(self, value):
         self.__faint_end_magnitude = value
 
     @property
     def orbital_height(self):
         return self.__orbital_height
 
-    @orbital_height.setter
-    def orbital_height(self, value):
+    def set_orbital_height(self, value):
         self.__orbital_height = value
 
     @property
