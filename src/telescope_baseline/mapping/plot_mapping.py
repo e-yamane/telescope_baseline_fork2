@@ -52,7 +52,7 @@ def plot_targets(l,b,ans,pos=None,outfile="map.png"):
     plt.show()
 
 def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
-    """plot targets in general
+    """plot number of targets 
 
     Args:
        l: l
@@ -60,7 +60,7 @@ def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
        ans: targets position
        pos: detector position
        outfile: output file name
-
+       cmap: colormap
     """
 
     fig=plt.figure()
@@ -72,7 +72,16 @@ def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
     labels(cb,outfile,ax)
 
 def plot_ae_targets(l,b,nans,pos=None,outfile="aemap.png",cmap="CMRmap",vmax=50.0):
-    """plot astrometric error
+    """plot astrometric errors targets 
+
+    Args:
+       l: l
+       b: b
+       ans: targets position
+       pos: detector position
+       outfile: output file name
+       cmap: colormap
+       vmax: colorbar max value
     """
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
@@ -83,6 +92,14 @@ def plot_ae_targets(l,b,nans,pos=None,outfile="aemap.png",cmap="CMRmap",vmax=50.
     labels(cb,outfile,ax)
 
 def labels(cb,outfile,ax):
+    """put label
+
+    Args:
+       cb: colorbar
+       outfile: output file name
+       ax: ax
+
+    """
     plt.colorbar(cb,shrink=0.5)
     ax.set_xlabel("l (deg)")
     ax.set_ylabel("b (deg)")
@@ -92,6 +109,14 @@ def labels(cb,outfile,ax):
 
     
 def hist_n_targets(nans,scale=1.0,outfile="nhist.png"):
+    """plot histogram of N of targets
+
+    Args:
+       nans: number array
+       scale: scale
+       outfile: output file name
+
+    """
     nans=nans[nans>0]
     orign=int(np.max(nans))
     nans=nans*scale
@@ -104,6 +129,14 @@ def hist_n_targets(nans,scale=1.0,outfile="nhist.png"):
     plt.show()
 
 def hist_ae_targets(final_ac,outfile="fac.png"):
+    """plot histogram of astrometric errors of targets
+
+    Args:
+       final_ac: number array
+       outfile: output file name
+
+    """
+
     fig=plt.figure()    
     ax=fig.add_subplot(111)
     cb=ax.hist(final_ac[final_ac<100.0], alpha=0.5, bins=25, ec='navy')
