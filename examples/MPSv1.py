@@ -40,8 +40,8 @@ if __name__ == "__main__":
     
     final_ac=ac/np.sqrt(nans*scale)/np.sqrt(Nstar)    
 
-    hist_n_targets(nans)
     plot_ae_targets(l,b,final_ac,cmap="CMRmap_r")    
-    plot_n_targets(l,b,nans,pos=pos_all,cmap="CMRmap_r")    
-    plot_n_targets(l,b,nans,cmap="CMRmap_r")    
+    plot_n_targets(l,b,scale*nans,pos=pos_all,cmap="CMRmap_r")    
+    plot_n_targets(l,b,scale*nans,cmap="CMRmap_r",outfile="nno.png")    
     hist_ae_targets(final_ac)
+    hist_n_targets(scale*nans)

@@ -4,6 +4,15 @@ from telescope_baseline.mapping.aperture import ang2lb
 from matplotlib import patches
 
 def add_region(pos,ax,autoshift=True,alpha=0.3):
+    """plot a patch of detector region on sky
+
+    Args:
+       pos: position list in l,b
+       ax: ax for plotting
+       autoshift: if True, convert l to -180, 180 deg
+       alpha: alpha
+
+    """
     for i in range(len(pos)):
         xy=np.array(ang2lb(pos[i]))
         if autoshift:
@@ -13,7 +22,18 @@ def add_region(pos,ax,autoshift=True,alpha=0.3):
         ax.add_patch(patch)
         
 
-def plot_targets(l,b,ans,outfile="map.png"):
+def plot_targets(l,b,ans,pos=None,outfile="map.png"):
+    """plot targets in general
+
+    Args:
+       l: l
+       b: b
+       ans: targets position
+       pos: detector position
+       outfile: output file name
+
+    """
+    
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
     ax.plot(l,b,".",alpha=0.03,color="black")
@@ -23,6 +43,8 @@ def plot_targets(l,b,ans,outfile="map.png"):
     else:
         for ans_each in ans:
             ax.plot(l[ans_each],b[ans_each],".",alpha=0.05,color="C3")
+    if pos is not None:
+        add_region(pos,ax)
     ax.set_xlabel("l (deg)")
     ax.set_ylabel("b (deg)")
     plt.gca().invert_xaxis()
@@ -30,6 +52,17 @@ def plot_targets(l,b,ans,outfile="map.png"):
     plt.show()
 
 def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
+    """plot targets in general
+
+    Args:
+       l: l
+       b: b
+       ans: targets position
+       pos: detector position
+       outfile: output file name
+
+    """
+
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
     cb=ax.scatter(l,b,s=1,c=nans,alpha=0.9,cmap=cmap)
