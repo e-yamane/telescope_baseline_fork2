@@ -187,8 +187,8 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         each_width: square width
 
     Returns:
-        inout mask of four detectors (in = 1 or out = 0 mask)
-
+        answer: inout mask of four detectors (in = 1 or out = 0 mask)
+        convexes: convex positions 
     """    
     convex=square_convex(center,PA,width)
     convex=np.array(convex)
@@ -201,7 +201,7 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         ans=inout_convex_on_sphere(each_convex,targets)        
         ans=np.array(ans,dtype=np.bool_)
         answers = answers + ans 
-    return answers
+    return answers, convexes
 
 def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
     """checking if targets are in or out four square convexes
@@ -214,7 +214,8 @@ def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_m
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
     Returns:
-        inout mask of four detectors (in = 1 or out = 0 mask)
+        answer: inout mask of four detectors (in = 1 or out = 0 mask)
+        convexes: convex positions 
 
     """
     center=lb2ang(l_center,b_center)

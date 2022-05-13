@@ -1,5 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from telescope_baseline.mapping.aperture import ang2lb
+from matplotlib import patches
+
+def add_region(pos,ax,autoshift=True,alpha=0.3):
+    for i in range(len(pos)):
+        xy=np.array(ang2lb(pos[i]))
+        if autoshift:
+            xy[0]=np.mod(xy[0]+180.0,360.0)-180.0
+        xy=xy.T
+        patch = patches.Polygon(xy=xy, closed=True,fill=False,ls="--",lw=0.5,color="green",alpha=alpha)
+        ax.add_patch(patch)
+        
 
 def plot_targets(l,b,ans,outfile="map.png"):
     fig=plt.figure()
@@ -17,19 +29,23 @@ def plot_targets(l,b,ans,outfile="map.png"):
     plt.savefig(outfile)        
     plt.show()
 
-def plot_n_targets(l,b,nans,outfile="nmap.png",cmap="CMRmap"):
+def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
     cb=ax.scatter(l,b,s=1,c=nans,alpha=0.9,cmap=cmap)
+    if pos is not None:
+        add_region(pos,ax)
     ax.set_facecolor('gray')
     labels(cb,outfile,ax)
 
-def plot_ae_targets(l,b,nans,outfile="aemap.png",cmap="CMRmap",vmax=50.0):
+def plot_ae_targets(l,b,nans,pos=None,outfile="aemap.png",cmap="CMRmap",vmax=50.0):
     """plot astrometric error
     """
     fig=plt.figure()
     ax=fig.add_subplot(111,aspect=1.0)
     cb=ax.scatter(l,b,s=1,c=nans,alpha=0.9, cmap=cmap, vmax=vmax)
+    if pos is not None:
+        add_region(pos,ax)
     ax.set_facecolor('black')
     labels(cb,outfile,ax)
 
@@ -42,9 +58,9 @@ def labels(cb,outfile,ax):
     plt.show()
 
     
-def hist_n_targets(nans,scale,outfile="nhist.png"):
+def hist_n_targets(nans,scale=1.0,outfile="nhist.png"):
     nans=nans[nans>0]
-    orign=np.max(nans)
+    orign=int(np.max(nans))
     nans=nans*scale
     fig=plt.figure()
     ax=fig.add_subplot(111)

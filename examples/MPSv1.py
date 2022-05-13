@@ -26,15 +26,22 @@ if __name__ == "__main__":
     
     nans=np.zeros_like(hw)
     for i in tqdm.tqdm(range(0,Ng*Ng)):
-        nans_each=obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm,left=gx[i],top=gy[i])
+        nans_each,pos_each=obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm,left=gx[i],top=gy[i])
         nans=nans+nans_each
- 
+        if i==0:
+            pos_all=pos_each
+        else:
+            pos_all=np.vstack([pos_all,pos_each])
+
     scale=50.0*6000/12.0/(Ng*Ng)
     
     print("Nobs=",len(nans[nans>0]))
-#    plot_n_targets(l,b,nans*scale) #number
     ac=6000 # micro arcsec per frame
-    print(ac,scale,Nstar)
+    
     final_ac=ac/np.sqrt(nans*scale)/np.sqrt(Nstar)    
+
+    hist_n_targets(nans)
     plot_ae_targets(l,b,final_ac,cmap="CMRmap_r")    
+    plot_n_targets(l,b,nans,pos=pos_all,cmap="CMRmap_r")    
+    plot_n_targets(l,b,nans,cmap="CMRmap_r")    
     hist_ae_targets(final_ac)

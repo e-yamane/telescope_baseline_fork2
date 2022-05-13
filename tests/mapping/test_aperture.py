@@ -52,14 +52,16 @@ def test_inout_detector():
     import pkg_resources           
     from telescope_baseline.mapping.read_catalog import read_jasmine_targets
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
-    targets,l,b=read_jasmine_targets(hdf)
+    targets,l,b, hw=read_jasmine_targets(hdf)
     each_width_mm=19.52
     width_mm=22.4
     EFL_mm=4370.0
     l_center=-0.5
     b_center=0.5
     PA=30.0
-    ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans,pos=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
     assert np.sum(ans)==2091
     return ans
 
+if __name__=="__main__":
+    test_inout_detector()
