@@ -3,6 +3,7 @@ from exocounts import convmag
 from astropy import constants as const
 from astropy import units as u
 import numpy as np
+from telescope_baseline.photometry.photoobs import obsclass
 
 ejas=exocounts.InstClass()
 ejas.lamb = 1.25*u.micron #micron
@@ -24,7 +25,7 @@ target.teff = 3000.0*u.K #K
 target.rstar = 0.2*const.R_sun #Rsolar
 target.d = 15.0*u.pc #pc
 
-obs=exocounts.ObsClass(ejas,target) 
+obs=obsclass(ejas,target) 
 
 obs.texposure = 0.0833*u.h #cadence [hour]
 obs.tframe = 12.5*u.s  #time for one frame [sec]
