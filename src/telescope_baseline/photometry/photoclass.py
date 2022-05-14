@@ -1,13 +1,42 @@
 import numpy as np
 from astropy import units as u
+from telescope_baseline.tools.mission.parameters import Parameters
 
-class obsclass(object):
+class InstClass(object):
+    """Class for Instrumental Setting used in exocounts, matched to InstClass in exocounts but using Parameters."""
+    def __init__(self):
+        
+        par = Parameters()
+        self.lamb = (par.high_wavelength_limit + par.low_wavelength_limit)/2.0*u.m
+        self.dlam = (par.high_wavelength_limit - par.low_wavelength_limit)*u.m
+        self.dtel = par.aperture_diameter*u.m
+        self.dstel = par.aperture_inner_diameter*u.m
+        self.throughput = par.total_efficiency
+        self.ndark = par.dark_current/u.s  # nd
+        self.nread = par.read_out_noise  # nr
+        self.fullwell = par.full_well_electron
+        self.fgtel = 0.0  # foreground from a telescope
+        self.fgatm = 0.0  # foreground from atmosphere
+
+
+class TargetClass(object):
+    """Class for Astronomical Targets."""
+
+    def __init__(self):
+        self.teff = None
+        self.rstar = None
+        self.d = None
+        self.name = 'No Name'
+        self.contrast = 1
+        
+class ObsClass(object):
     """Class for Observational Procedure."""
 
     def __init__(self, Inst, Target):
+
         self.inst = Inst
         self.target = Target
-
+        
         # INPUTS
         self.mu = None
         self.texposure = None  # th
@@ -48,8 +77,6 @@ class obsclass(object):
         from exocounts import nstar
         nstar.Nstar(self.inst, self.target, self)
         ppm = 1.e6
-        # hr2sec=3600.0
-        # ndframe=self.texposure*hr2sec*self.inst.ndark
         ndframe = self.texposure.to(u.s)*self.inst.ndark
 
         try:
@@ -73,3 +100,5 @@ class obsclass(object):
                                        self.texposure*(self.inst.dtel/2.0)**2*np.pi*self.inst.throughput).to(1)
         except:
             self.nphoton_foreground = None
+
+
