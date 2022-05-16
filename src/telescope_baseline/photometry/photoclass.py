@@ -6,7 +6,7 @@ class InstClass(object):
     """Class for Instrumental Setting used in exocounts, matched to InstClass in exocounts but using Parameters."""
     def __init__(self):
         
-        par = Parameters()
+        par = Parameters.get_instance()    
         self.lamb = (par.high_wavelength_limit + par.low_wavelength_limit)/2.0*u.m
         self.dlam = (par.high_wavelength_limit - par.low_wavelength_limit)*u.m
         self.dtel = par.aperture_diameter*u.m
