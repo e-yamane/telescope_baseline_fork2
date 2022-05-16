@@ -160,7 +160,7 @@ def inout_convex_on_sphere(convex_ang,target_ang):
     mask=(cosa>=0.0)*(cosa<=1.0)
     return np.prod(mask,axis=0)
 
-def inout_single_square_covex(targets,center,PA,width):
+def inout_single_square_convex(targets,center,PA,width):
     """checking if targets are in or out single square convex
     
     Args:

@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, inout_convex_on_sphere, square_convex, inout_single_square_covex, inout_four_sqaure_convexes, inout_detector
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, inout_convex_on_sphere, square_convex, inout_single_square_convex, inout_four_sqaure_convexes, inout_detector
 from telescope_baseline.mapping.pixelfunc import vec2ang
 import numpy as np
 import pytest
