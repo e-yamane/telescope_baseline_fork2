@@ -3,18 +3,45 @@ import numpy as np
 from telescope_baseline.mapping.aperture import ang2lb
 from matplotlib import patches
 
+def convert_to_convexes(larger_convex):
+    """ Convert convexesset, large_convex or larger convex to convexes
+
+    Args:
+       larger_convex: convexes set
+
+    Returns:
+       convexes (Nconvex, 2, Nvertex)
+
+    """
+    pos=np.array(larger_convex)
+    shapepos=np.array(np.shape(pos))
+    if len(shapepos) > 3:
+
+        Nextra_dimension=len(shapepos)-2
+        M=np.prod(shapepos[0:Nextra_dimension])
+        pos=pos.reshape((M,2,4))
+        return pos
+    elif len(shapepos) == 3:
+        return pos
+    else:
+        raise ValueError("larger_convex should be larger than convexes.")
+
+
+
+
 def add_region(pos,ax,autoshift=True,alpha=0.3):
     """plot a patch of detector region on sky
 
     Args:
-       pos: position list in l,b
+       pos: convexes (Nconvex, 2, Nvertex)
        ax: ax for plotting
        autoshift: if True, convert l to -180, 180 deg
        alpha: alpha
 
     """
-    for i in range(len(pos)):
-        xy=np.array(ang2lb(pos[i]))
+    M=np.shape(pos)[0]
+    for i in range(M):
+        xy=np.array(ang2lb(pos[i,:]))
         if autoshift:
             xy[0]=np.mod(xy[0]+180.0,360.0)-180.0
         xy=xy.T

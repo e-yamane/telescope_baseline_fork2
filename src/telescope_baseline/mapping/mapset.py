@@ -4,13 +4,13 @@
 
 """
 import numpy as np
-from telescope_baseline.mapping.aperture import lb_detector_unit, inout_four_sqaure_convexes, ang_detector_unit, lb2ang, ang2lb
+from telescope_baseline.mapping.aperture import lb_detector_unit, four_square_convexes, inout_four_square_convexes, ang_detector_unit, lb2ang, ang2lb
 
-def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
-    """checking if targets are in or out (extended) L shape formation
+
+def Lshape(l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
+    """make convexes set of (extended) L shape formation
     
     Args:
-        targats: targets coordinate list (in radian)
         l_center: center of galactic coordinate, l (deg)
         b_center: center of galactic coordinate, b (deg)
         PA_deg: position angle in deg
@@ -21,8 +21,7 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
         top: shift to top of the upper two fields 
 
     Returns:
-        answer: inout mask sequence (in = 1 or out = 0 mask)
-        convexes: convex positions 
+        convexesset: convexes set
 
     """
     center=lb2ang(l_center,b_center)
@@ -30,29 +29,45 @@ def inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=
     width=width_mm/EFL_mm
     each_width=each_width_mm/EFL_mm
     
-    ans=[]
-    convexpos=[]
-    a,p=inout_four_sqaure_convexes(targets, center, PA, width, each_width)
-    ans.append(a)
-    convexpos=p
-    a,p=inout_four_sqaure_convexes(targets, ang_detector_unit("R",0.5,center,PA,width), PA, width, each_width)
-    ans.append(a)    
-    convexpos=np.vstack([convexpos,p])
+    convexesset=[]
+    convexes=four_square_convexes(center, PA, width, each_width)
+    convexesset.append(convexes)
+    
+    convexes=four_square_convexes(ang_detector_unit("R",0.5,center,PA,width), PA, width, each_width)
+    convexesset.append(convexes)
+    
     pos=ang_detector_unit("L",left,center,PA,width)
-    a,p=inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.0+top,pos,PA,width), PA, width, each_width)
-    ans.append(a)
-    convexpos=np.vstack([convexpos,p])
-    a,p=inout_four_sqaure_convexes(targets, ang_detector_unit("T",1.5+top,pos,PA,width), PA, width, each_width)
-    ans.append(a)        
-    convexpos=np.vstack([convexpos,p])
+    convexes=four_square_convexes(ang_detector_unit("T",1.0+top,pos,PA,width), PA, width, each_width)
+    convexesset.append(convexes)
 
-    return ans, convexpos
+    convexes=four_square_convexes(ang_detector_unit("T",1.5+top,pos,PA,width), PA, width, each_width)
+    convexesset.append(convexes)
 
-def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
-    """in or out large frame
+    return convexesset
 
+def inout_Lshape(targets,convexesset):
+    """checking if targets are in or out (extended) L shape formation
+    
     Args:
         targats: targets coordinate list (in radian)
+        convexesset: convexesset
+
+    Returns:
+        answer: inout mask sequence (in = 1 or out = 0 mask), (4, N)
+                                             
+    """
+    
+    ans=[]
+    for convexes in convexesset:
+        a=inout_four_square_convexes(targets, convexes)
+        ans.append(a)
+
+    return ans
+
+def large_frame(l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
+    """compute large_convex
+
+    Args:
         l_center: center of galactic coordinate, l (deg)
         b_center: center of galactic coordinate, b (deg)
         PA_deg: position angle in deg
@@ -63,35 +78,50 @@ def inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=22.4, each_widt
         top: shift to top of the upper two fields 
 
     Returns:
-        inout mask sequence of inout mask of four detectors (in = 1 or out = 0 mask)
-        convex position 
+        in/out large frame
     """
     #shift
     l_center,b_center=lb_detector_unit("L",left,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
     l_center,b_center=lb_detector_unit("T",top,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
     
-    #right L
-    ans,pos=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
-    
+    #right L        
+    large_convex=[]
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
+    large_convex.append(convexesset)
     #mid L
     l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)    
-    ans2,pos2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
-    ans=np.vstack([ans,ans2])
-    pos=np.vstack([pos,pos2])
+    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
+    large_convex.append(convexesset)
+
     #left L
     l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    ans2,pos2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
-    ans=np.vstack([ans,ans2])
-    pos=np.vstack([pos,pos2])
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    large_convex.append(convexesset)
 
-    return ans,pos
+    return large_convex
 
-def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
-    """number of observed for MPSv1
+
+def inout_large_frame(targets,large_convex):
+    """in or out large frame
 
     Args:
         targats: targets coordinate list (in radian)
+        large_convex: large_convex
+    Returns:
+        inout mask sequence of inout mask of four detectors (in = 1 or out = 0 mask), (3,4,N)
+    """
+    ans=[]
+    for convexesset in large_convex:
+        a=inout_Lshape(targets,convexesset)
+        ans.append(a)
+
+    return ans
+
+def fillgap_large_frame(l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0, left=0.0, top=0.0):
+    """fill gap dithering 
+
+    Args:
         l_center: center of galactic coordinate, l (deg)
         b_center: center of galactic coordinate, b (deg)
         PA_deg: position angle in deg
@@ -102,16 +132,33 @@ def obsn_MPSv1(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19
         top: shift to top of the upper two fields 
 
     Returns:
-        number of observation
-        position
+        fillgap large convex, (4,3,4,N)
     """
-    ans1,pos1=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=-0.125/2.0+top)
-    ans2,pos2=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=-0.125/2.0+top)
-    ans3,pos3=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=0.125/2.0+top)
-    ans4,pos4=inout_large_frame(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=0.125/2.0+top)
+    pos=[]
+    pos1=large_frame(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=-0.125/2.0+top)
+    pos.append(pos1)
+    pos2=large_frame(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=-0.125/2.0+top)
+    pos.append(pos2)
+    pos3=large_frame(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.125+left,top=0.125/2.0+top)
+    pos.append(pos3)
+    pos4=large_frame(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=-0.125+left,top=0.125/2.0+top)
+    pos.append(pos4)
 
-    ans=np.vstack([ans1,ans2,ans3,ans4])
-    pos=np.vstack([pos1,pos2,pos3,pos4])
+    return pos
 
-    nans=np.sum(ans,axis=0)
-    return nans, pos
+def inout_fillgap_large_frame(targets, fillgap_large_convexes):
+    """inout fill gap dithering 
+
+    Args:
+        targets: targets
+        fillgap_large_convex: fillgap_large_convex
+
+    Returns:
+        inout mask sequence of inout mask of four detectors (in = 1 or out = 0 mask), (3,4,N)
+    """
+    ans=[]
+    for large_convex in fillgap_large_convexes:
+        a=inout_large_frame(targets,large_convex)
+        ans.append(a)
+    return ans
+

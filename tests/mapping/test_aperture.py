@@ -1,4 +1,4 @@
-from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, inout_convex_on_sphere, square_convex, inout_single_square_convex, inout_four_sqaure_convexes, inout_detector
+from telescope_baseline.mapping.aperture import cos_angle_from_normal_vectorAB, vec2ring, inout_convex_on_sphere, square_convex, inout_single_square_convex, inout_detector
 from telescope_baseline.mapping.pixelfunc import vec2ang
 import numpy as np
 import pytest
@@ -59,7 +59,7 @@ def test_inout_detector():
     l_center=-0.5
     b_center=0.5
     PA=30.0
-    ans,pos=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans=inout_detector(targets,l_center,b_center,PA, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
     assert np.sum(ans)==2091
     return ans
 
