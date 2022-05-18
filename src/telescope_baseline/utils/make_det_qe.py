@@ -33,7 +33,7 @@ if __name__ == '__main__':
     output_file = args['-j']
 
 """
- wavelength(temperature,wavelengths_298K_um )
+ wavelength(temperature, wavelengths_298K_um)
   = (wavelength_298K_um - wavelength_base_nm) * alpha * (temperature_K - 298 )
      + wavelength_298K_um
 
