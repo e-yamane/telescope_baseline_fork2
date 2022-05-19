@@ -47,7 +47,7 @@ def add_region(pos,ax,autoshift=True,alpha=0.3):
         xy=xy.T
         patch = patches.Polygon(xy=xy, closed=True,fill=False,ls="--",lw=0.5,color="green",alpha=alpha)
         ax.add_patch(patch)
-        
+
 
 def plot_targets(l,b,ans,pos=None,outfile="map.png"):
     """plot targets in general
@@ -169,5 +169,25 @@ def hist_ae_targets(final_ac,outfile="fac.png"):
     cb=ax.hist(final_ac[final_ac<100.0], alpha=0.5, bins=25, ec='navy')
     ax.set_ylabel("number of targets")
     ax.set_xlabel("final accuracy [umas]")
+    plt.savefig(outfile)        
+    plt.show()
+
+
+def plot_convexes(l,b,pos,outfile="pos.png"):
+    """plot convexes
+
+    Args:
+       l: l
+       b: b
+       convexes: convexes
+    """
+
+    fig=plt.figure()
+    ax=fig.add_subplot(111,aspect=1.0)
+    ax.plot(l,b,".",alpha=0.01,color="gray")
+    add_region(pos,ax,alpha=0.7)
+    ax.set_xlabel("l (deg)")
+    ax.set_ylabel("b (deg)")
+    plt.gca().invert_xaxis()
     plt.savefig(outfile)        
     plt.show()
