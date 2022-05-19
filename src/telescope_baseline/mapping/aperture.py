@@ -57,7 +57,7 @@ def basic_convex(center,PA,width,anglist,scale):
     return np.array(Cang)
 
 def square_convex(center,PA,width):
-    """compute a single sqaure convex
+    """compute a single square convex
     Args: 
         center: theta, phi of the center
         PA: position angle of the detector (north up)
@@ -160,7 +160,7 @@ def inout_convex_on_sphere(convex_ang,target_ang):
     mask=(cosa>=0.0)*(cosa<=1.0)
     return np.prod(mask,axis=0)
 
-def inout_single_square_covex(targets,center,PA,width):
+def inout_single_square_convex(targets,center,PA,width):
     """checking if targets are in or out single square convex
     
     Args:
@@ -176,9 +176,8 @@ def inout_single_square_covex(targets,center,PA,width):
     ans=np.array(ans,dtype=np.bool_)
     return ans
 
-
-def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
-    """checking if targets are in or out four square convexes
+def four_square_convexes(center,PA,width,each_width):
+    """make four square convexes
     
     Args:
         center: theta, phi of the center in radian
@@ -187,26 +186,41 @@ def inout_four_sqaure_convexes(targets, center,PA,width,each_width):
         each_width: square width
 
     Returns:
-        inout mask of four detectors (in = 1 or out = 0 mask)
-
+        convexes: convex positions 
     """    
     convex=square_convex(center,PA,width)
     convex=np.array(convex)
     convexes=[]
-    Ntarget=np.shape(targets)[1]
-    answers=np.zeros(Ntarget,dtype=np.bool_)
     for i in range(0,4):
         each_convex=square_convex(convex[:,i],PA,each_width)
         convexes.append(each_convex)
+    return convexes
+
+
+def inout_four_square_convexes(targets, convexes):
+    """checking if targets are in or out four square convexes
+    
+    Args:
+        targets: targets ang position list
+        convexes: convexes
+
+    Returns:
+        answer: inout mask of four detectors (in = 1 or out = 0 mask) (N,)
+    """    
+    Ntarget=np.shape(targets)[1]
+    answers=np.zeros(Ntarget,dtype=np.bool_)
+    for each_convex in convexes:
         ans=inout_convex_on_sphere(each_convex,targets)        
         ans=np.array(ans,dtype=np.bool_)
-        answers = answers + ans 
+        answers = answers + ans
+    #print(np.shape(answers), "four detector")
     return answers
 
 def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_mm=19.52,  EFL_mm=4370.0):
     """checking if targets are in or out four square convexes
     
     Args:
+        targets: targets
         l_center: center of galactic coordinate, l (deg)
         b_center: center of galactic coordinate, b (deg)
         PA_deg: position angle in deg
@@ -214,10 +228,12 @@ def inout_detector(targets,l_center,b_center,PA_deg, width_mm=22.4, each_width_m
         each_width_mm: the chip width in the unit of mm
         EFL_mm: effective focal length in the unit of mm
     Returns:
-        inout mask of four detectors (in = 1 or out = 0 mask)
+        answer: inout mask of four detectors (in = 1 or out = 0 mask)
+        convexes: convex positions 
 
     """
     center=lb2ang(l_center,b_center)
     PA=PA_deg/180.0*np.pi
-    return inout_four_sqaure_convexes(targets, center, PA, width_mm/EFL_mm, each_width_mm/EFL_mm)
+    convexes=four_square_convexes(center,PA,width_mm/EFL_mm, each_width_mm/EFL_mm)
+    return inout_four_square_convexes(targets, convexes)
 

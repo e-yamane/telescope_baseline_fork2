@@ -6,7 +6,7 @@ if __name__=="__main__":
     import pkg_resources
     import numpy as np
     from telescope_baseline.mapping.aperture import lb_detector_unit
-    from telescope_baseline.mapping.mapset import inout_Lshape
+    from telescope_baseline.mapping.mapset import Lshape,inout_Lshape
     from telescope_baseline.mapping.read_catalog import read_jasmine_targets
     from telescope_baseline.mapping.plot_mapping import plot_targets
     
@@ -18,21 +18,24 @@ if __name__=="__main__":
     PA_deg=0.0
 
     hdf=pkg_resources.resource_filename('telescope_baseline', 'data/cat.hdf')
-    targets,l,b=read_jasmine_targets(hdf)
+    targets,l,b, hw=read_jasmine_targets(hdf)
     #    ans=inout_detector(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
 
     #right L
-    ans=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=1.0,top=-0.75)
+    ans=inout_Lshape(targets,convexesset)
 
     #mid L
     l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)    
-    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
+    l_center,b_center=lb_detector_unit("B",0.75,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm, left=0.5)
+    ans2=inout_Lshape(targets,convexesset)
     ans=np.vstack([ans,ans2])
     
     #left L
     l_center,b_center=lb_detector_unit("L",1.5,l_center,b_center, PA_deg, width_mm=width_mm, EFL_mm=EFL_mm)
-    ans2=inout_Lshape(targets,l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    convexesset=Lshape(l_center,b_center,PA_deg, width_mm=width_mm, each_width_mm=each_width_mm, EFL_mm=EFL_mm)
+    ans2=inout_Lshape(targets,convexesset)
     ans=np.vstack([ans,ans2])
 
     for i,ans_each in enumerate(ans):
