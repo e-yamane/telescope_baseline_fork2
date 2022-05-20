@@ -19,11 +19,11 @@ class Efficiency:
     title:      str = 'Default'
     comment:    str = 'default value'
 
-    @classmethod
     def __post_init__(self):
         assert self.wavelength.shape == self.efficiency.shape, \
             'wavelength and efficiency should have the same shape'
 
+    @classmethod
     def from_json(cls, filename):
         """This method creates efficiency array data depend on wavelength.
 
