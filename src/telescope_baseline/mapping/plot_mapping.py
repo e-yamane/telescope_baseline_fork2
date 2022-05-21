@@ -84,7 +84,7 @@ def plot_n_targets(l,b,nans,pos=None,outfile="nmap.png",cmap="CMRmap"):
     Args:
        l: l
        b: b
-       ans: targets position
+       nans: number of observations for targets
        pos: detector position
        outfile: output file name
        cmap: colormap
@@ -104,7 +104,7 @@ def plot_ae_targets(l,b,nans,pos=None,outfile="aemap.png",cmap="CMRmap",vmax=50.
     Args:
        l: l
        b: b
-       ans: targets position
+       nans: number of observations for targets
        pos: detector position
        outfile: output file name
        cmap: colormap
