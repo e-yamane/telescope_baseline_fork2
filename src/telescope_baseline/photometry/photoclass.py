@@ -9,7 +9,7 @@ class InstClass(object):
         par = Parameters.get_instance()    
         self.lamb = (par.high_wavelength_limit + par.low_wavelength_limit)/2.0*u.m
         self.dlam = (par.high_wavelength_limit - par.low_wavelength_limit)*u.m
-        self.dtel = par.aperture_diameter*u.m
+        self.dtel = par.effective_pupil_diameter*u.m
         self.dstel = par.aperture_inner_diameter*u.m
         self.throughput = par.total_efficiency
         self.ndark = par.dark_current/u.s  # nd
