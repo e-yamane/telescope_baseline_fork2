@@ -166,10 +166,10 @@ class Parameters:
         self.__quantum_efficiency = value
 
     @property
-    def attitude_control_error(self):
+    def attitude_control_error_mas(self):
         return self.__attitude_control_error_mas
 
-    def set_attitude_control_error(self, value):
+    def set_attitude_control_error_mas(self, value):
         if value < 0:
             raise ValueError('Attitude Control Error should be positive.')
         self.__attitude_control_error_mas = value
@@ -233,7 +233,7 @@ class Parameters:
 
 # TODO: The unit of background photon flux should be independent of diameter and band
     @property
-    def galactic_center_photon_flux(self):
+    def background_photon_flux(self):
         return self.__background_photon_flux
 
     def set_background_photon_flux(self, value):
