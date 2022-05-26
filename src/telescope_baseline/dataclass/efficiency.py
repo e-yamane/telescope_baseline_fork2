@@ -14,13 +14,13 @@ class Efficiency:
         comment (str): Comments.
     """
     # set sample data as default
-    wavelength: np.ndarray = np.array([0.9, 1.6])
-    efficiency: np.ndarray = np.array([0.85, 0.85])
+    wavelength_grid: np.ndarray = np.array([0.9, 1.6])
+    efficiency_grid: np.ndarray = np.array([0.85, 0.85])
     title:      str = 'Default'
     comment:    str = 'default value'
 
     def __post_init__(self):
-        assert self.wavelength.shape == self.efficiency.shape, \
+        assert self.wavelength_grid.shape == self.efficiency_grid.shape, \
             'wavelength and efficiency should have the same shape'
 
     @classmethod
@@ -35,17 +35,29 @@ class Efficiency:
         """
         with open(filename, 'r') as fp:
             js = json.load(fp)
-            wavelength = np.array(js['wavelength'])
-            efficiency = np.array(js['efficiency'])
+            wavelength_grid = np.array(js['wavelength'])
+            efficiency_grid = np.array(js['efficiency'])
             if 'title' in js:
                 title = js['title']
             if 'comment' in js:
                 comment = js['comment']
 
         wlefic = Efficiency(
-            wavelength=wavelength,
-            efficiency=efficiency,
+            wavelength_grid=wavelength_grid,
+            efficiency_grid=efficiency_grid,
             title=title,
             comment=comment)
 
         return wlefic
+
+    def efficiency_interp(self,wavelength):
+        """compute the interpolated value of efficiency
+
+        Args:
+            wavelength: wavelength 
+
+        Returns:
+            interpolated efficiency
+        """
+        val=np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
+        return val
