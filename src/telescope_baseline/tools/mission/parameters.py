@@ -96,6 +96,7 @@ class Parameters:
 # TODO: check it should be const or variable?
         self.__cell_pix = 13
         self.__use_M_flag = False
+        self.__reference_wave_length = 1.4e-6
 
     @property
     def effective_pupil_diameter(self):
@@ -370,6 +371,6 @@ class Parameters:
     def set_exposure_time(self, value):
         self.__exposure_time = value
 
-    def cpix(self, wave_length=1.4e-5):
-        return wave_length * self.__effective_focal_length / self.__effective_pupil_diameter / self.__pixel_size
-
+    @property
+    def cpix(self):
+        return self.__reference_wave_length * self.__effective_focal_length / self.__effective_pupil_diameter / self.__pixel_size
