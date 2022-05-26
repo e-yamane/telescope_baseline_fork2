@@ -58,6 +58,15 @@ class Efficiency:
 
         Returns:
             interpolated efficiency
+
+        Examples:
+            
+            >>> testdata = 'data/teleff.json'
+            >>> peclist = pkg_resources.resource_filename('telescope_baseline', testdata)
+            >>> efficiency = Efficiency.from_json(speclist)
+            >>> wavref=np.linspace(0.8,1.6,1000)
+            >>> val=efficiency.interp(wavref)
+
         """
         val=np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
         return val
@@ -71,6 +80,17 @@ class Efficiency:
 
         Returns:
             weighted mean of efficiency
+
+        Examples:
+            
+            >>> testdata = 'data/teleff.json'
+            >>> peclist = pkg_resources.resource_filename('telescope_baseline', testdata)
+            >>> efficiency = Efficiency.from_json(speclist)
+            >>> wavref=np.linspace(0.8,1.6,1000)
+            >>> weight=np.exp(-(wavref-1.2)**2.0)
+            >>> val=efficiency.weighted_mean(wavref,weight)
+
+
         """
         assert wavelength.shape == weight.shape, \
             'wavelength and weight should have the same shape'
