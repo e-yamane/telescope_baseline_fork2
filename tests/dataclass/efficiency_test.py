@@ -13,20 +13,27 @@ def test_from_json():
     assert efficiency.efficiency_grid[3] == approx(0.84)
     assert efficiency.wavelength_grid[3] == approx(1.4)
 
-def test_efficiency_interp():
+def test_interp():
     testdata = 'data/teleff.json'
     speclist = pkg_resources.resource_filename('telescope_baseline', testdata)
     efficiency = Efficiency.from_json(speclist)
     wavref=np.linspace(0.8,1.6,1000)
-    val=efficiency.efficiency_interp(wavref)
+    val=efficiency.interp(wavref)
     
     import matplotlib.pyplot as plt
     plt.plot(wavref,val)
     plt.xlabel("wavelength")
     plt.ylabel("efficiency")
-    plt.savefig("efficiency.png")
+    plt.savefig("efficiency_interp.png")
 
     assert np.sum(val) == approx(809.045945945946)
+
+def test_weighted_mean():
+    testdata = 'data/teleff.json'
+    speclist = pkg_resources.resource_filename('telescope_baseline', testdata)
+    efficiency = Efficiency.from_json(speclist)
+    wavref=np.linspace(0.8,1.6,1000)
+    weight=np.exp(-(wavref-1.2)**2.0)
+    val=efficiency.weighted_mean(wavref,weight)
+    assert val==approx(0.8095121156784766)
     
-if __name__=="__main__":
-    test_efficiency_interp()

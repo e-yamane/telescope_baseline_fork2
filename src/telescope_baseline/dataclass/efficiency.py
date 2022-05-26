@@ -21,7 +21,7 @@ class Efficiency:
 
     def __post_init__(self):
         assert self.wavelength_grid.shape == self.efficiency_grid.shape, \
-            'wavelength and efficiency should have the same shape'
+            'wavelength_grid and efficiency_grid should have the same shape'
 
     @classmethod
     def from_json(cls, filename):
@@ -50,7 +50,7 @@ class Efficiency:
 
         return wlefic
 
-    def efficiency_interp(self,wavelength):
+    def interp(self,wavelength):
         """compute the interpolated value of efficiency
 
         Args:
@@ -61,3 +61,18 @@ class Efficiency:
         """
         val=np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
         return val
+
+    def weighted_mean(self,wavelength,weight):
+        """compute the weighted mean of interpolated efficiency
+
+        Args:
+            wavelength: wavelength 
+            weight: weight
+
+        Returns:
+            weighted mean of efficiency
+        """
+        assert wavelength.shape == weight.shape, \
+            'wavelength and weight should have the same shape'
+        return np.sum(self.interp(wavelength)*weight)/np.sum(weight)
+        
