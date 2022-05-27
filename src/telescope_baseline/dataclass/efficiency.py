@@ -50,8 +50,8 @@ class Efficiency:
 
         return wlefic
 
-    def evaluate(self,wavelength):
-        """evaluate the efficiency by a linear interpolation
+    def evaluate(self, wavelength):
+        """evaluate the efficiency by a linear interpolation.
 
         Args:
             wavelength: wavelength 
@@ -60,19 +60,18 @@ class Efficiency:
             interpolated efficiency
 
         Examples:
-            
+
             >>> testdata = 'data/teleff.json'
             >>> peclist = pkg_resources.resource_filename('telescope_baseline', testdata)
             >>> efficiency = Efficiency.from_json(speclist)
             >>> wavref=np.linspace(0.8,1.6,1000)
             >>> val=efficiency.evaluate(wavref)
-
         """
-        val=np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
+        val = np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
         return val
 
-    def weighted_mean(self,wavelength,weight):
-        """compute the weighted mean of interpolated efficiency
+    def weighted_mean(self, wavelength, weight):
+        """compute the weighted mean of interpolated efficiency.
 
         Args:
             wavelength: wavelength 
@@ -82,17 +81,14 @@ class Efficiency:
             weighted mean of efficiency
 
         Examples:
-            
+
             >>> testdata = 'data/teleff.json'
             >>> peclist = pkg_resources.resource_filename('telescope_baseline', testdata)
             >>> efficiency = Efficiency.from_json(speclist)
             >>> wavref=np.linspace(0.8,1.6,1000)
             >>> weight=np.exp(-(wavref-1.2)**2.0)
             >>> val=efficiency.weighted_mean(wavref,weight)
-
-
         """
         assert wavelength.shape == weight.shape, \
             'wavelength and weight should have the same shape'
         return np.sum(self.evaluate(wavelength)*weight)/np.sum(weight)
-        
