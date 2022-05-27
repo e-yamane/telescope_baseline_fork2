@@ -50,8 +50,8 @@ class Efficiency:
 
         return wlefic
 
-    def interp(self,wavelength):
-        """compute the interpolated value of efficiency
+    def evaluate(self,wavelength):
+        """evaluate the efficiency by a linear interpolation
 
         Args:
             wavelength: wavelength 
@@ -65,7 +65,7 @@ class Efficiency:
             >>> peclist = pkg_resources.resource_filename('telescope_baseline', testdata)
             >>> efficiency = Efficiency.from_json(speclist)
             >>> wavref=np.linspace(0.8,1.6,1000)
-            >>> val=efficiency.interp(wavref)
+            >>> val=efficiency.evaluate(wavref)
 
         """
         val=np.interp(wavelength, self.wavelength_grid, self.efficiency_grid)
@@ -94,5 +94,5 @@ class Efficiency:
         """
         assert wavelength.shape == weight.shape, \
             'wavelength and weight should have the same shape'
-        return np.sum(self.interp(wavelength)*weight)/np.sum(weight)
+        return np.sum(self.evaluate(wavelength)*weight)/np.sum(weight)
         
