@@ -16,7 +16,7 @@ The repository consists of the following components.
 
 - `src/telescope_baseline`
 - `examples`
-- `tools`
+- `snippets`
 - `tests`
 
 
@@ -33,10 +33,13 @@ The directory `src/telescope_baseline` contains the following directories.
     - `mission`: Provides `the Parameters` class.
 - `utils`: _Contents in this directory should be moved elsewhere_
 
-### Examples
 
-### Utils
-Snippets to prepare data and to generate images are stored in `tools`.
+### Examples
+Example codes are stored in this directory.
+
+### Snippets
+Snippets to prepare data and to generate images are stored in `snippets`.
+
 
 ### Tests
 Test cases are provided in the `tests` directory. We use `pytest` to check the code itegrity. Install `pytest` via `pip` and type the following line to test the code. _Do not forget to test the code before making a pull request._
