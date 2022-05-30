@@ -30,7 +30,7 @@ The directory `src/telescope_baseline` contains the following directories.
 - `photometry`: Functions to estiamte a S/N ration in photometry.
 - `tools`: Elementary classes.
     - `efficiency`: Provides the `Filters` class.
-    - `mission`: Provides `the Parameters` class.
+    - `mission`: Provides the `Parameters` class.
 - `utils`: _Contents in this directory should be moved elsewhere_
 
 
