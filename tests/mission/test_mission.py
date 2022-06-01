@@ -1,6 +1,6 @@
 import math
 
-import pytest
+from pytest import approx
 from telescope_baseline.tools.mission.parameters import Parameters
 
 
@@ -23,11 +23,17 @@ def test_singleton_2():
 def test_efficiency():
     # number of mirror = 5, mirror reflection rate = 0.98, QE = 0.8, filter through put = 0.9 is assumed
     sg = Parameters.get_instance()
-    sg.set_number_of_mirrors(5)
-    sg.set_one_mirror_efficiency(0.98)
+    # sg.set_number_of_mirrors(5)
+    # sg.set_one_mirror_efficiency(0.98)
     sg.set_filter_efficiency(0.95)
     sg.set_quantum_efficiency(0.8)
-    assert 0.6869 < sg.total_efficiency < 0.6870
+    assert sg.total_efficiency == approx(0.6152292079156423)
+
+
+def test_troughput():
+    sg = Parameters.get_instance()
+    val = sg.telescope_through_put
+    assert val == approx(0.8095121156784766)
 
 
 def test_period():

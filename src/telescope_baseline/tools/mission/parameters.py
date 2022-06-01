@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import math
+import numpy as np
+import pkg_resources
+
+from telescope_baseline.dataclass.efficiency import Efficiency
 
 
 class Parameters:
@@ -30,7 +34,6 @@ class Parameters:
 
     """
     __instance = None
-
 
     @staticmethod
     def get_instance():
@@ -75,6 +78,9 @@ class Parameters:
         self.__detector_placement_x = 2
         self.__detector_placement_y = 2
         self.__orbital_height = 5.5E5  # meter
+        testdata = 'data/teleff.json'
+        speclist = pkg_resources.resource_filename('telescope_baseline', testdata)
+        self.__efficiency = Efficiency.from_json(speclist)
 
     @property
     def aperture_diameter(self):
@@ -83,7 +89,7 @@ class Parameters:
     def set_aperture_diameter(self, value):
         if value < self.__aperture_inner_diameter:
             raise ValueError('diameter value ' + str(value) + ' is smaller than inner diameter '
-                            + str(self.__aperture_inner_diameter) + '.')
+                             + str(self.__aperture_inner_diameter) + '.')
         self.__aperture_diameter = value
 
     @property
@@ -93,7 +99,7 @@ class Parameters:
     def set_aperture_inner_diameter(self, value):
         if value > self.__aperture_diameter:
             raise ValueError('inner diameter value ' + str(value) + ' is larger than diameter '
-                            + str(self.__aperture_diameter) + '.')
+                             + str(self.__aperture_diameter) + '.')
         self.__aperture_inner_diameter = value
 
     @property
@@ -186,7 +192,9 @@ class Parameters:
 
     @property
     def telescope_through_put(self):
-        return math.pow(self.__one_mirror_efficiency, self.__number_of_mirrors)
+        wave_ref = np.linspace(0.8, 1.6, 1000)
+        weight = np.exp(-(wave_ref - 1.2) ** 2.0)
+        return self.__efficiency.weighted_mean(wave_ref, weight)
 
     @property
     def total_efficiency(self):
