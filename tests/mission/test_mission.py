@@ -27,13 +27,13 @@ def test_efficiency():
     # sg.set_one_mirror_efficiency(0.98)
     sg.set_filter_efficiency(0.95)
     sg.set_quantum_efficiency(0.8)
-    assert sg.total_efficiency == approx(0.6152292079156423)
+    assert sg.total_efficiency == approx(0.627627)
 
 
 def test_troughput():
     sg = Parameters.get_instance()
     val = sg.telescope_through_put
-    assert val == approx(0.8095121156784766)
+    assert val == approx(0.825825)
 
 
 def test_period():

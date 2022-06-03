@@ -78,9 +78,9 @@ class Parameters:
         self.__detector_placement_x = 2
         self.__detector_placement_y = 2
         self.__orbital_height = 5.5E5  # meter
-        testdata = 'data/teleff.json'
-        speclist = pkg_resources.resource_filename('telescope_baseline', testdata)
-        self.__efficiency = Efficiency.from_json(speclist)
+        test_data = 'data/teleff.json'
+        spec_list = pkg_resources.resource_filename('telescope_baseline', test_data)
+        self.__efficiency = Efficiency.from_json(spec_list)
 
     @property
     def aperture_diameter(self):
@@ -192,9 +192,13 @@ class Parameters:
 
     @property
     def telescope_through_put(self):
-        wave_ref = np.linspace(0.8, 1.6, 1000)
-        weight = np.exp(-(wave_ref - 1.2) ** 2.0)
+        wave_ref = np.linspace(self.__low_wavelength_limit * 1e6, self.__high_wavelength_limit * 1e6, 1000)
+        weight = np.ones(1000)
         return self.__efficiency.weighted_mean(wave_ref, weight)
+
+    @property
+    def efficiency(self):
+        return self.__efficiency
 
     @property
     def total_efficiency(self):
@@ -284,3 +288,6 @@ class Parameters:
     def inclination(self):
         return math.acos(self.earth_c2 * math.pow((self.__EQUATORIAL_EARTH_RADIUS + self.__orbital_height) / 1000, 3.5)
                          * math.pow(1 - self.orbital_eccentricity * self.orbital_eccentricity, 2) * math.sqrt(1000))
+
+p = Parameters.get_instance()
+print(p.telescope_through_put)
