@@ -32,7 +32,7 @@ def test_efficiency():
 
 def test_troughput():
     sg = Parameters.get_instance()
-    val = sg.telescope_through_put
+    val = sg.average_telescope_throughput
     assert val == approx(0.825825)
 
 

@@ -14,7 +14,7 @@ class Parameters:
 
     Properties:
     Only getter is implemented without attribute:
-        telescope_through_put, total_efficiency, orbital_period, earth_mu, earth_c1, earth_c2, inclination
+        average_telescope_throughput, total_efficiency, orbital_period, earth_mu, earth_c1, earth_c2, inclination
 
     Only getter is implemented with attribute:
         pixel_size, maneuver_time, large_maneuver_time, detector_format_x, detector_format_y,
@@ -80,7 +80,7 @@ class Parameters:
         self.__orbital_height = 5.5E5  # meter
         test_data = 'data/teleff.json'
         spec_list = pkg_resources.resource_filename('telescope_baseline', test_data)
-        self.__efficiency = Efficiency.from_json(spec_list)
+        self.__optics_efficiency = Efficiency.from_json(spec_list)
 
     @property
     def aperture_diameter(self):
@@ -191,18 +191,18 @@ class Parameters:
         self.__number_of_mirrors = value
 
     @property
-    def telescope_through_put(self):
+    def average_telescope_throughput(self):
         wave_ref = np.linspace(self.__low_wavelength_limit * 1e6, self.__high_wavelength_limit * 1e6, 1000)
         weight = np.ones(1000)
-        return self.__efficiency.weighted_mean(wave_ref, weight)
+        return self.__optics_efficiency.weighted_mean(wave_ref, weight)
 
     @property
-    def efficiency(self):
-        return self.__efficiency
+    def optics_efficiency(self):
+        return self.__optics_efficiency
 
     @property
     def total_efficiency(self):
-        return self.telescope_through_put * self.__filter_efficiency * self.__quantum_efficiency
+        return self.average_telescope_throughput * self.__filter_efficiency * self.__quantum_efficiency
 
     @property
     def read_out_noise(self):
@@ -288,6 +288,3 @@ class Parameters:
     def inclination(self):
         return math.acos(self.earth_c2 * math.pow((self.__EQUATORIAL_EARTH_RADIUS + self.__orbital_height) / 1000, 3.5)
                          * math.pow(1 - self.orbital_eccentricity * self.orbital_eccentricity, 2) * math.sqrt(1000))
-
-p = Parameters.get_instance()
-print(p.telescope_through_put)

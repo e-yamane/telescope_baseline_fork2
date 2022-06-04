@@ -11,7 +11,7 @@ par=Parameters.get_instance()
 par.set_aperture_diameter(0.36)
 par.set_quantum_efficiency(0.7)
 par.set_low_wavelength_limit(1.0e-6)
-print("Is this OK? -> telescope_through_put=", par.telescope_through_put)
+print("Is this OK? -> average_telescope_throughput=", par.average_telescope_throughput)
 cpix=1.7
 
 inst=InstClass()
