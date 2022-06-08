@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import math
+import numpy as np
+import pkg_resources
+
+from telescope_baseline.dataclass.efficiency import Efficiency
 
 
 class Parameters:
@@ -10,8 +14,7 @@ class Parameters:
 
     Properties:
     Only getter is implemented without attribute:
-        telescope_through_put, total_efficiency, orbital_period, earth_mu, earth_c1, earth_c2, inclination,
-        aperture_inner_diameter,
+        average_telescope_throughput, total_efficiency, orbital_period, earth_mu, earth_c1, earth_c2, inclination
 
     Only getter is implemented with attribute:
         pixel_size, maneuver_time, large_maneuver_time, detector_format_x, detector_format_y,
@@ -36,7 +39,6 @@ class Parameters:
     """
 
     __instance = None
-
 
     @staticmethod
     def get_instance():
@@ -97,6 +99,9 @@ class Parameters:
         self.__cell_pix = 13
         self.__use_M_flag = False
         self.__reference_wave_length = 1.4e-6
+        test_data = 'data/teleff.json'
+        spec_list = pkg_resources.resource_filename('telescope_baseline', test_data)
+        self.__optics_efficiency = Efficiency.from_json(spec_list)
 
     @property
     def effective_pupil_diameter(self):
@@ -211,12 +216,18 @@ class Parameters:
         self.__number_of_mirrors = value
 
     @property
-    def telescope_through_put(self):
-        return math.pow(self.__one_mirror_efficiency, self.__number_of_mirrors)
+    def average_telescope_throughput(self):
+        wave_ref = np.linspace(self.__low_wavelength_limit * 1e6, self.__high_wavelength_limit * 1e6, 1000)
+        weight = np.ones(1000)
+        return self.__optics_efficiency.weighted_mean(wave_ref, weight)
+
+    @property
+    def optics_efficiency(self):
+        return self.__optics_efficiency
 
     @property
     def total_efficiency(self):
-        return self.telescope_through_put * self.__filter_efficiency * self.__quantum_efficiency
+        return self.average_telescope_throughput * self.__filter_efficiency * self.__quantum_efficiency
 
     @property
     def read_out_noise(self):
