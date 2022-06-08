@@ -21,18 +21,23 @@ class Parameters:
         detector_placement_x, detector_placement_y, orbital_eccentricity
 
     Getter and Setter are implemented:
-        aperture_diameter, aperture_inner_diameter, focal_length, full_well_electron, saturation_magnitude,
+        effective_pupil_diameter, central_obscuration_ratio, effective_focal_length, full_well_electron,
+        saturation_magnitude, spider_type, spider_thickness
         quantum_efficiency, attitude_control_error, high_wavelength_limit, low_wavelength_limit, filter_efficiency,
         one_mirror_efficiency, number_of_mirrors, read_out_noise, dark_current, galactic_center_photon_flux,
-        standard_magnitude, faint_end_magnitude, orbital_height
+        standard_magnitude, faint_end_magnitude, orbital_altitude, exposure_time
 
     Not implemented yet
         saturation time, ltan
+
+    Functions:
+        cpix
 
     Known problem:
         Thread safety is not guaranteed.
 
     """
+
     __instance = None
 
     @staticmethod
@@ -53,18 +58,19 @@ class Parameters:
         self.__EARTH_J2 = 1.082632
         self.__ONE_YEAR = 31556926  # seconds
         self.__orbital_eccentricity = 0
-        self.__aperture_diameter = 0.4  # meter
-        self.__aperture_inner_diameter = 0.14  # meter
-        self.__focal_length = 4.8  # meter
+        self.__effective_pupil_diameter = 0.36  # meter
+        self.__central_obscuration_ratio = 0.35
+        self.__effective_focal_length = 4.8  # meter
         self.__pixel_size = 1.0e-5  # meter
         self.__maneuver_time = 115  # second
         self.__large_maneuver_time = 220  # second
         self.__full_well_electron = 100000
+# TODO: Definition of magnitude should be contains colour
         self.__saturation_magnitude = 10.0
         self.__standard_magnitude = 12.5
         self.__faint_end_magnitude = 14.5
         self.__quantum_efficiency = 0.8
-        self.__attitude_control_error = 275  # mas / 7 seconds
+        self.__attitude_control_error_mas = 275  # mas / 7 seconds
         self.__high_wavelength_limit = 1.6e-6  # meter
         self.__low_wavelength_limit = 1.0e-6  # meter
         self.__filter_efficiency = 0.95
@@ -72,42 +78,61 @@ class Parameters:
         self.__number_of_mirrors = 5
         self.__read_out_noise = 25  # electrons / read
         self.__dark_current = 5  # electrons / sec / pixel
-        self.__galactic_center_photon_flux = 5  # electrons / sec / pixel
-        self.__detector_format_x = 1952
-        self.__detector_format_y = 1952
+        self.__background_photon_flux = 5  # electrons / sec / pixel
         self.__detector_placement_x = 2
         self.__detector_placement_y = 2
-        self.__orbital_height = 5.5E5  # meter
+        self.__detector_separation_x = 0.02196  # meter
+        self.__detector_separation_y = 0.02196  # meter
+        self.__orbital_altitude = 5.5E5  # meter
+        self.__spider_type = ''
+        self.__spider_thickness = 0
+        self.__window_size_x = 9
+        self.__window_size_y = 9
+        self.__pixel_sampling_frequency = 2e5  # Hz
+        self.__ncol_ch = 123
+        self.__nrow_ch = 1952
+        self.__n_ch = 16
+        self.__npix_pre = 8
+        self.__npix_post = 8
+        self.__exposure_time = 10.0  # second(s)
+# TODO: check it should be const or variable?
+        self.__cell_pix = 13
+        self.__use_M_flag = False
+        self.__reference_wave_length = 1.4e-6
         test_data = 'data/teleff.json'
         spec_list = pkg_resources.resource_filename('telescope_baseline', test_data)
         self.__optics_efficiency = Efficiency.from_json(spec_list)
 
     @property
-    def aperture_diameter(self):
-        return self.__aperture_diameter
+    def effective_pupil_diameter(self):
+        return self.__effective_pupil_diameter
 
-    def set_aperture_diameter(self, value):
-        if value < self.__aperture_inner_diameter:
-            raise ValueError('diameter value ' + str(value) + ' is smaller than inner diameter '
-                             + str(self.__aperture_inner_diameter) + '.')
-        self.__aperture_diameter = value
+    def set_effective_pupil_diameter(self, value):
+        self.__effective_pupil_diameter = value
+
+    @property
+    def central_obscuration_ratio(self):
+        return self.__central_obscuration_ratio
+
+    def set_central_obscuration_ratio(self, value):
+        self.__central_obscuration_ratio = value
 
     @property
     def aperture_inner_diameter(self):
-        return self.__aperture_inner_diameter
-
-    def set_aperture_inner_diameter(self, value):
-        if value > self.__aperture_diameter:
-            raise ValueError('inner diameter value ' + str(value) + ' is larger than diameter '
-                             + str(self.__aperture_diameter) + '.')
-        self.__aperture_inner_diameter = value
+        return self.__effective_pupil_diameter * self.__central_obscuration_ratio
 
     @property
-    def focal_length(self):
-        return self.__focal_length
+    def effective_focal_length(self):
+        return self.__effective_focal_length
 
-    def set_focal_length(self, value):
-        self.__focal_length = value
+    def set_effective_focal_length(self, value):
+        if self.__use_M_flag:
+            return
+        self.__effective_focal_length = value
+
+    def set_effective_focal_length_from_M(self, m):
+        self.__use_M_flag = True
+        self.__effective_focal_length = self.__pixel_size * m * 1000 / self.__cell_pix
 
     @property
     def pixel_size(self):
@@ -147,13 +172,13 @@ class Parameters:
         self.__quantum_efficiency = value
 
     @property
-    def attitude_control_error(self):
-        return self.__attitude_control_error
+    def attitude_control_error_mas(self):
+        return self.__attitude_control_error_mas
 
-    def set_attitude_control_error(self, value):
+    def set_attitude_control_error_mas(self, value):
         if value < 0:
             raise ValueError('Attitude Control Error should be positive.')
-        self.__attitude_control_error = value
+        self.__attitude_control_error_mas = value
 
     @property
     def high_wavelength_limit(self):
@@ -218,20 +243,21 @@ class Parameters:
     def set_dark_current(self, value):
         self.__dark_current = value
 
+# TODO: The unit of background photon flux should be independent of diameter and band
     @property
-    def galactic_center_photon_flux(self):
-        return self.__galactic_center_photon_flux
+    def background_photon_flux(self):
+        return self.__background_photon_flux
 
-    def set_galactic_center_photon_flux(self, value):
-        self.__galactic_center_photon_flux = value
+    def set_background_photon_flux(self, value):
+        self.__background_photon_flux = value
 
     @property
     def detector_format_x(self):
-        return self.__detector_format_x
+        return self.__nrow_ch
 
     @property
     def detector_format_y(self):
-        return self.__detector_format_y
+        return self.__ncol_ch * self.__n_ch - self.__npix_pre - self.__npix_post
 
     @property
     def detector_placement_x(self):
@@ -256,15 +282,15 @@ class Parameters:
         self.__faint_end_magnitude = value
 
     @property
-    def orbital_height(self):
-        return self.__orbital_height
+    def orbital_altitude(self):
+        return self.__orbital_altitude
 
-    def set_orbital_height(self, value):
-        self.__orbital_height = value
+    def set_orbital_altitude(self, value):
+        self.__orbital_altitude = value
 
     @property
     def orbital_period(self):
-        return 2 * math.pi * math.pow(self.__EQUATORIAL_EARTH_RADIUS + self.orbital_height, 1.5) / math.sqrt(
+        return 2 * math.pi * math.pow(self.__EQUATORIAL_EARTH_RADIUS + self.orbital_altitude, 1.5) / math.sqrt(
             self.__CONST_OF_GRAVITATION * self.__EARTH_MASS)
 
     @property
@@ -286,5 +312,76 @@ class Parameters:
 
     @property
     def inclination(self):
-        return math.acos(self.earth_c2 * math.pow((self.__EQUATORIAL_EARTH_RADIUS + self.__orbital_height) / 1000, 3.5)
+        return math.acos(self.earth_c2 * math.pow((self.__EQUATORIAL_EARTH_RADIUS + self.__orbital_altitude) / 1000, 3.5)
                          * math.pow(1 - self.orbital_eccentricity * self.orbital_eccentricity, 2) * math.sqrt(1000))
+
+    @property
+    def spider_type(self):
+        return self.__spider_type
+
+    def set_spider_type(self, value):
+        self.__spider_type = value
+
+    @property
+    def spider_thickness(self):
+        return self.__spider_thickness
+
+    def set_spider_thickness(self, value):
+        self.__spider_thickness = value
+
+    @property
+    def window_size_x(self):
+        return self.__window_size_x
+
+    def set_window_size_x(self, value):
+        self.__window_size_x = value
+
+    @property
+    def window_size_y(self):
+        return self.__window_size_y
+
+    def set_window_size_y(self, value):
+        self.__window_size_y = value
+
+    @property
+    def ncol_ch(self):
+        return self.__ncol_ch
+
+    @property
+    def nrow_ch(self):
+        return self.nrow_ch
+
+    @property
+    def npix_pre(self):
+        return self.__npix_pre
+
+    @property
+    def npix_post(self):
+        return self.__npix_post
+
+    @property
+    def n_ch(self):
+        return self.__n_ch
+
+    @property
+    def pixel_sampling_frequency(self):
+        return self.__pixel_sampling_frequency
+
+    @property
+    def detector_separation_x(self):
+        return self.__detector_separation_x
+
+    @property
+    def detector_separation_y(self):
+        return self.__detector_separation_y
+
+    @property
+    def exposure_time(self):
+        return self.__exposure_time
+
+    def set_exposure_time(self, value):
+        self.__exposure_time = value
+
+    @property
+    def cpix(self):
+        return self.__reference_wave_length * self.__effective_focal_length / self.__effective_pupil_diameter / self.__pixel_size

@@ -7,17 +7,17 @@ from telescope_baseline.tools.mission.parameters import Parameters
 def test_singleton():
     sg = Parameters.get_instance()
     two = Parameters.get_instance()
-    assert -0.0001 < sg.aperture_diameter - two.aperture_diameter < 0.0001
-    sg.set_aperture_diameter(0.2)
-    assert 0.19999 < two.aperture_diameter < 0.200001
-    assert -0.0001 < sg.aperture_diameter - two.aperture_diameter < 0.0001
+    assert -0.0001 < sg.effective_pupil_diameter - two.effective_pupil_diameter < 0.0001
+    sg.set_effective_pupil_diameter(0.2)
+    assert 0.19999 < two.effective_pupil_diameter < 0.200001
+    assert -0.0001 < sg.effective_pupil_diameter - two.effective_pupil_diameter < 0.0001
 
 
 def test_singleton_2():
     one = Parameters.get_instance()
-    one.set_aperture_diameter(0.2)
+    one.set_effective_pupil_diameter(0.2)
     two = Parameters.get_instance()
-    assert -0.0001 < one.aperture_diameter - 0.2 < 0.0001
+    assert -0.0001 < one.effective_pupil_diameter - 0.2 < 0.0001
 
 
 def test_efficiency():
@@ -38,11 +38,11 @@ def test_troughput():
 
 def test_period():
     sg = Parameters.get_instance()
-    sg.set_orbital_height(550000)
+    sg.set_orbital_altitude(550000)
     assert 5738 < sg.orbital_period < 5740
 
 
 def test_inclination():
     sg = Parameters.get_instance()
-    sg.set_orbital_height(550000)
+    sg.set_orbital_altitude(550000)
     assert 97.5 < math.degrees(sg.inclination) < 97.7
