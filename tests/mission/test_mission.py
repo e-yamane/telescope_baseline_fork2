@@ -23,11 +23,7 @@ def test_singleton_2():
 def test_efficiency():
     # number of mirror = 5, mirror reflection rate = 0.98, QE = 0.8, filter through put = 0.9 is assumed
     sg = Parameters.get_instance()
-    # sg.set_number_of_mirrors(5)
-    # sg.set_one_mirror_efficiency(0.98)
-    sg.set_filter_efficiency(0.95)
-    sg.set_quantum_efficiency(0.8)
-    assert sg.total_efficiency == approx(0.627627)
+    assert sg.total_efficiency == approx(0.6136365527435249)
 
 
 def test_troughput():
