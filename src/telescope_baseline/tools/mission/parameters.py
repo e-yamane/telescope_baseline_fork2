@@ -41,8 +41,8 @@ class Parameters:
     internal attributes:
         EARTH_MASS, CONST_OF_GRAVITATION, EQUATORIAL_EARTH_RADIUS, POLAR_EARTH_RADIUS, EARTH_J2, ONE_YEAR,
         (above constants should be referred by other common libraries. Values are referred from internet.)
-        cell_pix, use_M_flag, reference_wave_length
-        (The value of cell_pix is defined in JASMINE-CA-TN-HKZ-001-01_DblMir2021c. The value of reference_wave_length
+        cell_pix, use_M_flag, reference_wavelength
+        (The value of cell_pix is defined in JASMINE-CA-TN-HKZ-001-01_DblMir2021c. The value of reference_wavelength
         is defined by E2E meeting May 25th 2022.)
 
     Not implemented yet
@@ -106,17 +106,19 @@ class Parameters:
         self.__n_ch = 16
         self.__n_ref_pix_pre = 8
         self.__n_ref_pix_post = 8
+        self.__n_ref_pix_top = 8
+        self.__n_ref_pix_bottom = 8
         self.__exposure_time = 12.5  # second(s)
 # TODO: check it should be const or variable?
         self.__cell_pix = 13
         self.__use_M_flag = False
-        self.__reference_wave_length = 1.4e-6
+        self.__reference_wavelength = 1.4e-6
         spec_list = pkg_resources.resource_filename('telescope_baseline', 'data/teleff.json')
         self.__optics_efficiency = Efficiency.from_json(spec_list)
         # detector temperature
         spec_list = pkg_resources.resource_filename('telescope_baseline', 'data/qe/qe170.json')
         self.__quantum_efficiency = Efficiency.from_json(spec_list)
-        # filter cut off frequency ???
+        # filter cut on frequency ???
         f_name = "data/filter/filter" + str(int(self.__short_wavelength_limit * 1e8)).zfill(3) + ".json"
         spec_list = pkg_resources.resource_filename('telescope_baseline', f_name)
         self.__filter_efficiency = Efficiency.from_json(spec_list)
@@ -387,6 +389,14 @@ class Parameters:
         return self.__n_ref_pix_post
 
     @property
+    def n_ref_pix_top(self):
+        return self.__n_ref_pix_top
+
+    @property
+    def n_ref_pix_bottom(self):
+        return self.__n_ref_pix_bottom
+
+    @property
     def n_ch(self):
         return self.__n_ch
 
@@ -411,4 +421,4 @@ class Parameters:
 
     @property
     def c_pix(self):
-        return self.__reference_wave_length * self.__f_number / self.__pixel_size
+        return self.__reference_wavelength * self.__f_number / self.__pixel_size
