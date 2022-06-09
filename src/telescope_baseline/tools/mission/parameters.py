@@ -21,8 +21,8 @@ class Parameters:
 
     Only getter is implemented with attribute:
         orbital_eccentricity,　num_detector_x, num_detector_y, pixel_sampling_frequency, (temporal)
-        pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_pix_pre, n_pix_post,
-        (Detector specification: confidential)
+        pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_ref_pix_pre,
+        n_ref_pix_post, (Detector specification: confidential)
         maneuver_time, large_maneuver_time, (NEC report)
         optics_efficiency, quantum_efficiency, filter_efficiency (Read tables made by Kataza-san)
 
