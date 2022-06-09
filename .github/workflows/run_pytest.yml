@@ -2,10 +2,10 @@ name: run Pytest
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
   pull_request_review:
     types: [ "submitted" ]
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build:
