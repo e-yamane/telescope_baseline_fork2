@@ -7,8 +7,8 @@ class InstClass(object):
     def __init__(self):
         
         par = Parameters.get_instance()    
-        self.lamb = (par.high_wavelength_limit + par.low_wavelength_limit)/2.0*u.m
-        self.dlam = (par.high_wavelength_limit - par.low_wavelength_limit)*u.m
+        self.lamb = (par.long_wavelength_limit + par.short_wavelength_limit) / 2.0 * u.m
+        self.dlam = (par.long_wavelength_limit - par.short_wavelength_limit) * u.m
         self.dtel = par.effective_pupil_diameter*u.m
         self.dstel = par.aperture_inner_diameter*u.m
         self.throughput = par.total_efficiency
