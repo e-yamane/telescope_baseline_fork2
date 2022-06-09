@@ -37,6 +37,7 @@ The directory `src/telescope_baseline` contains the following directories.
 ### Examples
 Example codes are stored in this directory.
 
+
 ### Snippets
 Snippets to prepare data and to generate images are stored in `snippets`.
 
