@@ -24,7 +24,6 @@ class Parameters:
         pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_ref_pix_pre,
         n_ref_pix_post, (Detector specification: confidential)
         maneuver_time, large_maneuver_time, (NEC report)
-        optics_efficiency, quantum_efficiency, filter_efficiency (Read tables made by Kataza-san)
 
     Getter and Setter are implemented:
         effective_pupil_diameter, central_obscuration_ratio, short_wavelength_limit, orbital_altitude, window_size_x,
@@ -37,6 +36,7 @@ class Parameters:
         long_wavelength_limit, read_out_noise, dark_current, (Kakenhi-report 26247029 and private communications)
         background_photon_flux, (JASMINE-C2-TN-RO-20220330-01-background)
         spider_type, spider_thickness, (temporal values, Reference TBD)
+        optics_efficiency, quantum_efficiency, filter_efficiency (Read tables made by Kataza-san)
 
     internal attributes:
         EARTH_MASS, CONST_OF_GRAVITATION, EQUATORIAL_EARTH_RADIUS, POLAR_EARTH_RADIUS, EARTH_J2, ONE_YEAR,
@@ -145,7 +145,7 @@ class Parameters:
 
     def set_f_number(self, value):
         if self.__use_M_flag:
-            return
+            raise Exception("M_flag is True and cannot set f_number.")
         self.__f_number = value
 
     def set_f_number_from_m(self, m):
@@ -197,7 +197,9 @@ class Parameters:
     def long_wavelength_limit(self):
         return self.__long_wavelength_limit
 
+# TODO: long wavelength limit should be set from quantum_efficiency
     def set_long_wavelength_limit(self, value):
+        assert self.__short_wavelength_limit < value
         self.__long_wavelength_limit = value
 
     @property
@@ -232,13 +234,22 @@ class Parameters:
     def optics_efficiency(self):
         return self.__optics_efficiency
 
+    def set_optics_efficiency(self, value):
+        self.__optics_efficiency = value
+
     @property
     def filter_efficiency(self):
         return self.__filter_efficiency
 
+    def set_filter_efficiency(self, value):
+        self.__filter_efficiency = value
+
     @property
     def quantum_efficiency(self):
         return self.__quantum_efficiency
+
+    def set_quantum_efficiency(self, value):
+        self.__quantum_efficiency = value
 
     @property
     def total_efficiency(self):
@@ -365,7 +376,7 @@ class Parameters:
 
     @property
     def n_row_ch(self):
-        return self.n_row_ch
+        return self.__n_row_ch
 
     @property
     def n_ref_pix_pre(self):
