@@ -21,8 +21,8 @@ class Parameters:
 
     Only getter is implemented with attribute:
         orbital_eccentricity,　num_detector_x, num_detector_y, pixel_sampling_frequency, (temporal)
-        pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_ref_pix_pre,
-        n_ref_pix_post, (Detector specification: confidential)
+        pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_ref_pix_right,
+        n_ref_pix_left, (Detector specification: confidential)
         maneuver_time, large_maneuver_time, (NEC report)
 
     Getter and Setter are implemented:
@@ -102,10 +102,10 @@ class Parameters:
         self.__window_size_y = 9
         self.__pixel_sampling_frequency = 2e5  # Hz
         self.__n_col_ch = 123
-        self.__n_row_ch = 1952
+        self.__n_row_ch = 1968
         self.__n_ch = 16
-        self.__n_ref_pix_pre = 8
-        self.__n_ref_pix_post = 8
+        self.__n_ref_pix_left = 8
+        self.__n_ref_pix_right = 8
         self.__n_ref_pix_top = 8
         self.__n_ref_pix_bottom = 8
         self.__exposure_time = 12.5  # second(s)
@@ -281,11 +281,11 @@ class Parameters:
 
     @property
     def detector_format_x(self):
-        return self.__n_row_ch
+        return self.__n_row_ch - self.__n_ref_pix_top - self.__n_ref_pix_bottom
 
     @property
     def detector_format_y(self):
-        return self.__n_col_ch * self.__n_ch - self.__n_ref_pix_pre - self.__n_ref_pix_post
+        return self.__n_col_ch * self.__n_ch - self.__n_ref_pix_left - self.__n_ref_pix_right
 
     @property
     def num_detector_x(self):
@@ -381,12 +381,12 @@ class Parameters:
         return self.__n_row_ch
 
     @property
-    def n_ref_pix_pre(self):
-        return self.__n_ref_pix_pre
+    def n_ref_pix_left(self):
+        return self.__n_ref_pix_left
 
     @property
-    def n_ref_pix_post(self):
-        return self.__n_ref_pix_post
+    def n_ref_pix_right(self):
+        return self.__n_ref_pix_right
 
     @property
     def n_ref_pix_top(self):
