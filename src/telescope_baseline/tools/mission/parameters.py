@@ -118,7 +118,7 @@ class Parameters:
         # detector temperature
         spec_list = pkg_resources.resource_filename('telescope_baseline', 'data/qe/qe170.json')
         self.__quantum_efficiency = Efficiency.from_json(spec_list)
-        # filter cut on frequency ???
+        # filter cut on wavelength ???
         f_name = "data/filter/filter" + str(int(self.__short_wavelength_limit * 1e8)).zfill(3) + ".json"
         spec_list = pkg_resources.resource_filename('telescope_baseline', f_name)
         self.__filter_efficiency = Efficiency.from_json(spec_list)
