@@ -8,11 +8,8 @@ from telescope_baseline.tools.mission.parameters import Parameters
 
 #parameter setting
 par=Parameters.get_instance()
-par.set_aperture_diameter(0.36)
-par.set_quantum_efficiency(0.7)
-par.set_short_wavelength_limit(1.0e-6)
+#par.set_effective_pupil_diameter(0.35)
 print("Is this OK? -> average_telescope_throughput=", par.average_telescope_throughput)
-cpix=1.7
 
 inst=InstClass()
 target=TargetClass()
@@ -22,10 +19,10 @@ target.d=16.0*u.pc
 
 obs=ObsClass(inst,target) 
 obs.texposure = 0.0833*u.h #cadence [hour]
-obs.tframe = 12.5*u.s  #time for one frame [sec]
+obs.tframe = par.exposure_time*u.s  #time for one frame [sec]
 obs.napix = 15 # number of the pixels in aperture 
 obs.mu = 1 
-S=cpix*cpix*np.pi #core size
+S=par.c_pix*par.c_pix*np.pi #core size
 obs.effnpix = S/3.0 #3 is an approx. increment factor of PSF
 obs.mu = 1 
 obs.target = target
