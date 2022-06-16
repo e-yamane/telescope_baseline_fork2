@@ -20,9 +20,9 @@ class Parameters:
         earth_c1, earth_c2, inclination, c_pix
 
     Only getter is implemented with attribute:
-        orbital_eccentricity,　num_detector_x, num_detector_y, pixel_sampling_frequency, (temporal)
-        pixel_size, detector_separation_x, detector_separation_y, n_col_ch,　n_row_ch, n_ch, n_ref_pix_right,
-        n_ref_pix_left, (Detector specification: confidential)
+        orbital_eccentricity, num_detector_x, num_detector_y, pixel_sampling_frequency, (temporal)
+        pixel_size, detector_separation_x, detector_separation_y, n_col_ch, n_row_ch, n_ch, n_ref_pix_right,
+        n_ref_pix_left, n_ref_pix_top, n_ref_pix_bottom (Detector specification: confidential)
         maneuver_time, large_maneuver_time, (NEC report)
 
     Getter and Setter are implemented:
