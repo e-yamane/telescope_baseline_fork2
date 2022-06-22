@@ -6,10 +6,10 @@ class SimVisitor(metaclass=ABCMeta):
 
     Object structure is represented in SimComponent class and sub classes, which are implemented as Composite.
     """
-    from src.tools.pipeline.detectorimage import DetectorImage
-    from src.tools.pipeline.stellarimage import StellarImage
-    from src.tools.pipeline.ontheskyposition import OnTheSkyPosition
-    from src.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
+    from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
+    from telescope_baseline.tools.pipeline.stellarimage import StellarImage
+    from telescope_baseline.tools.pipeline.ontheskyposition import OnTheSkyPosition
+    from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
 
     def visit(self, obj):
         """visit method of simulation and analysis.
@@ -25,10 +25,10 @@ class SimVisitor(metaclass=ABCMeta):
         Returns:
             void
         """
-        from src.tools.pipeline.detectorimage import DetectorImage
-        from src.tools.pipeline.stellarimage import StellarImage
-        from src.tools.pipeline.ontheskyposition import OnTheSkyPosition
-        from src.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
+        from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
+        from telescope_baseline.tools.pipeline.stellarimage import StellarImage
+        from telescope_baseline.tools.pipeline.ontheskyposition import OnTheSkyPosition
+        from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
         if isinstance(obj, DetectorImage):
             self.visit_di(obj)
         elif isinstance(obj, StellarImage):

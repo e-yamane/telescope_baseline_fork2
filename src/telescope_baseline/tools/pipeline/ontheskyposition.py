@@ -1,4 +1,4 @@
-from src.tools.pipeline.simnode import SimNode
+from telescope_baseline.tools.pipeline.simnode import SimNode
 
 
 class OnTheSkyPosition(SimNode):

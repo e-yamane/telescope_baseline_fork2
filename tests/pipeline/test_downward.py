@@ -1,4 +1,4 @@
-from src.tools.pipeline.visitor import SimVisitor
+from telescope_baseline.tools.pipeline.visitor import SimVisitor
 import pytest
 
 
@@ -34,8 +34,8 @@ class SimpleUpwardVisitor(SimVisitor):
 
 @pytest.fixture(scope="module")
 def fixture1():
-    from src.tools.pipeline.stellarimage import StellarImage
-    from src.tools.pipeline.detectorimage import DetectorImage
+    from telescope_baseline.tools.pipeline.stellarimage import StellarImage
+    from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
     print("Pre Processing\n")
     v = SimpleUpwardVisitor()
     a = DetectorImage()

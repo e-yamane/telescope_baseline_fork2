@@ -1,5 +1,5 @@
 from abc import ABC
-from src.tools.pipeline.simcomponent import SimComponent
+from telescope_baseline.tools.pipeline.simcomponent import SimComponent
 
 
 class SimNode(SimComponent, ABC):
