@@ -6,4 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: 'jasmine'
+    working_dir: /opt/jasmine
     tty: true
+    volumes:
+      - .:/opt/jasmine
