@@ -1,0 +1,9 @@
+version: '3.4'
+services:
+  jasmine:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'jasmine'
+    tty: true
