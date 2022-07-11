@@ -5,8 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        UID: $UID
+        GID: $GID
+        UNAME: $UNAME
     container_name: 'jasmine'
-    working_dir: /opt/jasmine
+    user: $UID:$GID
+    working_dir: /home/$UNAME/jasmine
     tty: true
     volumes:
-      - .:/opt/jasmine
+      - .:/home/$UNAME/jasmine
