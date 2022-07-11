@@ -1,9 +1,12 @@
 # Dockerメモ
 
 ## コンテナ作成
-Dockerfileとか、requirements.txtを書き直したときに実行
+Dockerfileとか、requirements.txtを書き直したときに実行。
 
-``docker-compose build``
+※docker-buildは自作コマンドです。
+
+```./docker-build```
+
 
 ## コンテナ起動
 基本的には一度起動したら落とさなくても良い

@@ -23,12 +23,12 @@ ENV UNAME ${UNAME}
 RUN groupadd -g ${GID} ${UNAME} ;exit 0
 RUN useradd -u ${UID} -g ${GID} -m ${UNAME}
 
-COPY ./setVolumePermission.sh /home/${UNAME}
-RUN chmod +x /home/${UNAME}/setVolumePermission.sh
+COPY ./docker/setVolumePermission.sh /tmp
+RUN chmod +x /tmp/setVolumePermission.sh
 
-ENTRYPOINT ["sh", "-c", "/home/${UNAME}/setVolumePermission.sh"]
+ENTRYPOINT ["sh", "-c", "/tmp/setVolumePermission.sh"]
 
 RUN python -m pip install --upgrade pip setuptools
-COPY requirements.txt /tmp
+COPY ./requirements.txt /tmp
 WORKDIR /tmp
 RUN python -m pip install -r requirements.txt
