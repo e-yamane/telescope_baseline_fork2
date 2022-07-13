@@ -13,5 +13,5 @@ jobs:
       with:
         python-version: 3.9
 
-      - name: build and test
-        uses: ./.github/actions/build
+    - name: build and test
+      uses: ./.github/actions/build
