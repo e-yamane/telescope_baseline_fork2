@@ -7,7 +7,7 @@ def test_cos_angle_from_normal_vectorAB():
     a=np.array([1,0,0])
     b=np.array([0,1,0])
     v=cos_angle_from_normal_vectorAB(a,b,[ np.cross(a,b)])
-    assert v[0]==1
+    assert v[0]==100
 
 def test_vec2ring():
     a=np.array([[1,1,1],[2,2,2],[3,3,3],[4,4,4],[5,5,5],[6,6,6]])
