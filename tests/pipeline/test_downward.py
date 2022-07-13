@@ -2,7 +2,7 @@ from telescope_baseline.tools.pipeline.visitor import SimVisitor
 import pytest
 
 
-class SimpleUpwardVisitor(SimVisitor):
+class SimpleDownwardVisitor(SimVisitor):
     def __init__(self):
         self.__num = 0
 
@@ -37,7 +37,7 @@ def fixture1():
     from telescope_baseline.tools.pipeline.stellarimage import StellarImage
     from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
     print("Pre Processing\n")
-    v = SimpleUpwardVisitor()
+    v = SimpleDownwardVisitor()
     a = DetectorImage()
     b = DetectorImage()
     c = StellarImage()

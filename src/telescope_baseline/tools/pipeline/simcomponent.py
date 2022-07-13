@@ -13,6 +13,9 @@ class SimComponent(metaclass=ABCMeta):
     def __init__(self):
         self._parent = None
 
+    def has_parent(self):
+        return not (self._parent is None)
+
     @abstractmethod
     def get_child_size(self):
         pass

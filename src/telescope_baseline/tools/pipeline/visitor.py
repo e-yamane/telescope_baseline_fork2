@@ -100,17 +100,3 @@ class DataTypeException(Exception):
     def __str__(self):
         return "Data Type Exception"
 
-
-class SimpleDownwardVisitor(SimVisitor):
-
-    def visit_di(self, obj):
-        pass
-
-    def visit_si(self, obj):
-        pass
-
-    def visit_os(self, obj):
-        pass
-
-    def visit_ap(self, obj):
-        pass
