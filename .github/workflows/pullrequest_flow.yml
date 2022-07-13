@@ -1,4 +1,4 @@
-name: run Pytest
+name: workflow when PullRequest
 
 on:
   pull_request:
