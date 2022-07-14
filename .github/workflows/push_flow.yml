@@ -13,5 +13,14 @@ jobs:
       with:
         python-version: 3.9
 
-    - name: build and test
+    - name: get dependencies
+      uses: ./.github/actions/get_dependencies
+
+    - name: linter
+      uses: ./.github/actions/linter
+
+    - name: build
       uses: ./.github/actions/build
+
+    - name: test
+      uses: ./.github/actions/test
