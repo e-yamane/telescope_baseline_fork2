@@ -16,9 +16,6 @@ jobs:
     - name: get dependencies
       uses: ./.github/actions/get_dependencies
 
-    - name: linter
-      uses: ./.github/actions/linter
-
     - name: build
       uses: ./.github/actions/build
 
