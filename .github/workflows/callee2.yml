@@ -1,9 +1,0 @@
-name: Callee2 Job
-on:
-  workflow_call:
-
-jobs:
-  Build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo called2!
