@@ -1,0 +1,10 @@
+name: Caller
+
+on:
+  push:
+
+jobs:
+  reuse1:
+    uses: ./.github/workflows/callee1.yml
+  reuse2:
+    uses: ./.github/workflows/callee2.yml
