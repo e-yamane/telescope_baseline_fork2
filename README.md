@@ -1,3 +1,6 @@
+[![pytest](https://github.com/JASMINE-Mission/telescope_baseline/actions/workflows/pytest.yml/badge.svg)](https://github.com/JASMINE-Mission/telescope_baseline/actions/workflows/pytest.yml)
+[![linter](https://github.com/JASMINE-Mission/telescope_baseline/actions/workflows/linter.yml/badge.svg)](https://github.com/JASMINE-Mission/telescope_baseline/actions/workflows/linter.yml)
+
 # Baseline study of the JASMINE telescope
 
 This respository provides documents and tools to define the baseline design of the JASMINE telescope. Type the following lines to install `telescope_baseline` package in your environment.
