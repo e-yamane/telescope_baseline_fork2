@@ -8,7 +8,7 @@ class SimVisitor(metaclass=ABCMeta):
     """
     from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
     from telescope_baseline.tools.pipeline.stellarimage import StellarImage
-    from telescope_baseline.tools.pipeline.ontheskyposition import OnTheSkyPosition
+    from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
     from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
 
     def visit(self, obj):
@@ -27,13 +27,13 @@ class SimVisitor(metaclass=ABCMeta):
         """
         from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
         from telescope_baseline.tools.pipeline.stellarimage import StellarImage
-        from telescope_baseline.tools.pipeline.ontheskyposition import OnTheSkyPosition
+        from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
         from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
         if isinstance(obj, DetectorImage):
             self.visit_di(obj)
         elif isinstance(obj, StellarImage):
             self.visit_si(obj)
-        elif isinstance(obj, OnTheSkyPosition):
+        elif isinstance(obj, OnTheSkyPositions):
             self.visit_os(obj)
         elif isinstance(obj, AstrometricCatalogue):
             self.visit_ap(obj)
@@ -65,7 +65,7 @@ class SimVisitor(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def visit_os(self, obj: OnTheSkyPosition):
+    def visit_os(self, obj: OnTheSkyPositions):
         """The visit function that is called when an obj is an instance of the OnTheSkyCoordinate class.
 
         Args:

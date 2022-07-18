@@ -1,6 +1,6 @@
 from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
 from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
-from telescope_baseline.tools.pipeline.ontheskyposition import OnTheSkyPosition
+from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
 from telescope_baseline.tools.pipeline.stellarimage import StellarImage
 from visitor import SimVisitor
 
@@ -18,7 +18,7 @@ class Analysis(SimVisitor):
         # construct_epsf()
         # xmatch()
 
-    def visit_os(self, obj: OnTheSkyPosition):
+    def visit_os(self, obj: OnTheSkyPositions):
         for i in range(obj.get_child_size()):
             obj.get_child(i).accept(self)
         print("os")
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     a = AstrometricCatalogue()
     o = []
     for i in range(10):
-        o.append(OnTheSkyPosition())
+        o.append(OnTheSkyPositions())
     for i in range(len(o)):
         a.add_child(o[i])
     v = Analysis()
