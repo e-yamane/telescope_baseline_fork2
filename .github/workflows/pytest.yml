@@ -23,5 +23,7 @@ jobs:
       uses: ./.github/actions/build
 
     - name: test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: ./.github/actions/test
 
