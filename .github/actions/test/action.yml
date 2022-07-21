@@ -16,9 +16,9 @@ runs:
       continue-on-error: true
       run: |
         python -m pip install pytest pytest-html pytest-cov
-        PYTHONPATH=`pwd`/src
-        echo $PYTHONPATH
-        pytest tests --junitxml=pages/test_report/$BRANCH/pytest.xml --html=pages/test_report/$BRANCH/pytest.html --cov=src --cov-branch --cov-report=term-missing
+        pushd src
+        pytest ../tests --junitxml=../pages/test_report/$BRANCH/pytest.xml --html=../pages/test_report/$BRANCH/pytest.html --cov=. --cov-branch --cov-report=term-missing
+        popd
       shell: bash
 
     - name: Generate Test Report Index
