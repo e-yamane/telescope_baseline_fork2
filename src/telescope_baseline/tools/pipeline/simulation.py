@@ -1,13 +1,15 @@
 from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
 from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
-from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
+from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions, SkyPosition
 from telescope_baseline.tools.pipeline.stellarimage import StellarImage
 from telescope_baseline.tools.pipeline.catalogue_entry import CatalogueEntry
 from visitor import SimVisitor
 import astropy.units as u
-import astropy.coordinates
 from astropy.time import Time
 from astropy.coordinates import SkyCoord
+import numpy as np
+from astropy import wcs
+from astropy.io import fits
 
 
 class Simulation(SimVisitor):
@@ -25,16 +27,14 @@ class Simulation(SimVisitor):
         pass
 
     def visit_si(self, obj: StellarImage):
-        # if obj.has_parent():
-        #     obj.parent.get_list()
-        # world_to_pixel()
+        print("si")
+        if obj.has_parent():
+            obj.get_parent_list()
+            obj.world_to_pixel()
         for i in range(obj.get_child_size()):
             obj.get_child(i).accept(self)
 
     def visit_os(self, obj: OnTheSkyPositions):
-        # if obj.has_parent():
-        #     obj.parent.get_list()
-        # set_stellar_position
         print("os")
         if obj.has_parent():
             obj.get_parent_list()
@@ -50,35 +50,26 @@ class Simulation(SimVisitor):
 
 
 if __name__ == '__main__':
-    t = [Time('2000-01-01 00:00:00.0'), Time('2000-02-01 00:00:00.0'), Time('2000-03-01 00:00:00.0'),
-         Time('2000-04-01 00:00:00.0'), Time('2000-05-01 00:00:00.0'), Time('2000-06-01 00:00:00.0'),
-         Time('2000-07-01 00:00:00.0'), Time('2000-08-01 00:00:00.0'), Time('2000-09-01 00:00:00.0'),
-         Time('2000-10-01 00:00:00.0'), Time('2000-11-01 00:00:00.0'), Time('2000-12-01 00:00:00.0'),
-         Time('2001-01-01 00:00:00.0')]
-    c1 = SkyCoord(l=0, b=0, unit=('deg', 'deg'), frame="galactic", distance=100 * u.pc, obstime=t[0],
-                  pm_l_cosb=0 * u.mas / u.yr, pm_b=0 * u.mas / u.yr)
-    c2 = SkyCoord(l=0, b=0, unit=('deg', 'deg'), frame="galactic", distance=1 * u.pc, obstime=t[0],
-                  pm_l_cosb=-1000 * u.mas / u.yr, pm_b=1200 * u.mas / u.yr)
-    a = AstrometricCatalogue()
-    a.add_entry(CatalogueEntry(1, c1, 12.5))
-    a.add_entry(CatalogueEntry(2, c2, 12.5))
+    t = Time('2000-01-01 00:00:00.0')
+    c1 = SkyCoord(l=0, b=0, unit=('deg', 'deg'), frame="galactic")
+    c2 = SkyCoord(l=0, b=0.1, unit=('deg', 'deg'), frame="galactic")
+    c3 = SkyCoord(l=0, b=1.0, unit=('deg', 'deg'), frame="galactic")
 
-    o = []
-    for i in range(len(t)):
-        o.append(OnTheSkyPositions(t[i]))
-    for i in range(len(o)):
-        a.add_child(o[i])
+    w = wcs.WCS(naxis=2)
+    w.wcs.crpix = [256, 256]  # Reference point in pixel
+    w.wcs.cd = [[1.31e-4,0], [0,1.31e-4]]  # cd matrix
+    w.wcs.crval = [0, 0]  #
+    w.wcs.ctype = ["GLON-TAN", "GLAT-TAN"]
+
+    o = OnTheSkyPositions(t)
+    o.add_entry(SkyPosition(1, c1, 12.5))
+    o.add_entry(SkyPosition(2, c2, 12.0))
+    o.add_entry(SkyPosition(3, c3, 13.5))
+    s = StellarImage(w)
+    o.add_child(s)
+
     v = Simulation()
-    a.accept(v)
+    o.accept(v)
 
-    # call accept method for top.
-    print("---")
-    for i in range(len(o)):
-        c = o[i].get(0)
-        print(str(c.ra) + "," + str(c.dec))
-    print("---")
-    for i in range(len(o)):
-        sc1 = c1.apply_space_motion(new_obstime=t[i])
-        print(str(sc1.gcrs.ra.deg) + "," + str(sc1.gcrs.dec.deg))
-    print(c2.icrs.ra.deg)
-    print(c2.icrs.dec.deg)
+    print(s.get_list())
+

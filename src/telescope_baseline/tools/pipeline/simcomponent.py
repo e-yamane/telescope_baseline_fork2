@@ -14,7 +14,12 @@ class SimComponent(metaclass=ABCMeta):
         self._parent = None
 
     def has_parent(self):
-        return not (self._parent is None)
+        """Check whether the object has parent or not.
+
+        Returns: if it ha parent return true, otherwise return false.
+
+        """
+        return self._parent is not None
 
     @abstractmethod
     def get_child_size(self):

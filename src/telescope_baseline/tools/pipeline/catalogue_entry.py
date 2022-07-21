@@ -3,7 +3,19 @@ import astropy.units as u
 
 
 class CatalogueEntry:
+    """The data holder class of the catalogue entry.
+
+    This is the data holder class.So, the values are set in the argument of constructor, and got by property.
+
+    """
     def __init__(self, number, coord:SkyCoord, mag):
+        """The constructor
+
+        Args:
+            number: id of the entry.
+            coord: astropy.coordinates.SkyCoord object
+            mag: magnitude of the star
+        """
         self.__id = number
         self.__coord = coord
         self.__mag = mag
