@@ -15,8 +15,8 @@ runs:
       id: pytest
       continue-on-error: true
       run: |
-        python -m pip install pytest pytest-html
-        pytest tests --junitxml=pages/test_report/$BRANCH/pytest.xml --html=pages/test_report/$BRANCH/pytest.html
+        python -m pip install pytest pytest-html pytest-cov
+        pytest tests --junitxml=pages/test_report/$BRANCH/pytest.xml --html=pages/test_report/$BRANCH/pytest.html --cov=src --cov-branch --cov-report=term-missing
       shell: bash
 
     - name: Generate Test Report Index
