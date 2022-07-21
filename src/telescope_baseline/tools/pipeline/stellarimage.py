@@ -56,6 +56,7 @@ class StellarImage(SimNode):
         TODO:
             * This class support only galactic coordinate in wcs. It should be more flexible.
             * This implementation not support the gap between detectors.
+            * __position_list should contain number of photons in x[i][2]
 
         """
         if "GLON" not in self.__wcs.wcs.ctype[0]:
@@ -71,6 +72,18 @@ class StellarImage(SimNode):
                     or self.__position_list[i][0] > self.__pix_max  or self.__position_list[i][1] > self.__pix_max:
                 self.__position_list = np.delete(self.__position_list, i, 0)
         #  for revert conversion use self.__wcs.wcs.wcs_pix2world(pix_array, 0)
+
+    def add_position(self, list):
+        """ List of stellar positions
+
+        Args:
+            list: ndarray of array (x, y, Nph) where x and y is the position in the pixel coordinate, and Nph is
+             number of photons.
+
+        Returns:
+
+        """
+        self.__position_list = list
 
     def get_list(self):
         """ Get observable stellar positions in detector coordinate
