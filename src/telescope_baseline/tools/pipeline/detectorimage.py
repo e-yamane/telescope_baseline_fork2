@@ -15,6 +15,10 @@ class DetectorImage(SimComponent):
         __array: ndarray of pixel data
         __hdu: fits primary hdu
 
+    Todo:
+        * detector format should be flexible
+        * PSF shape should be flexible, is now assumed as Gaussian
+
     """
     def __init__(self):
         super().__init__()
