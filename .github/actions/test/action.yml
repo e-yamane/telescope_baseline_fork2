@@ -21,26 +21,37 @@ runs:
         rm htmlcov/.gitignore
         rm -rf ../pages/test_report/$BRANCH/htmlcov
         mv htmlcov ../pages/test_report/$BRANCH/
+        ls -al
         popd
       shell: bash
 
-    - name: Generate Test Report Index
+    - name: Send Coverage Report to CodeClimate
+      if: ${{ steps.pytest.outcome == 'success' }}
+    - uses: paambaati/codeclimate-action@v2.2.4
       env:
-        BRANCH: ${{ github.ref_name}}
-        REPOSITORY: ${{ github.repository}}
-      run: |
-        pushd pages/test_report
-        echo "<html><head><title>JASMINE Testing Report</title></head><body><h1>JASMINE TESTING REPORT</h1><ul>" > index.html
-        find . -name pytest.html | xargs -Ixxx dirname xxx | awk '{print substr($0, 3)}' | xargs -Ixxx echo "<li><a href=\"https://github.com/$REPOSITORY/actions/workflows/pytest.yml?query=branch:xxx\"><img src=\"https://github.com/$REPOSITORY/actions/workflows/pytest.yml/badge.svg?branch=xxx\" alt=\"pytest\" style=\"max-width: 100%;\"></a>xxx<a href=\"xxx/pytest.html\">(Test Report)</a><a href=\"xxx/htmlcov/index.html\">(Test Coverage Report)</a></li>" >> index.html
-        echo "</ul></body></html>" >> index.html
-        popd
-      shell: bash
-
-    - name: Publish Test Report
-      uses: peaceiris/actions-gh-pages@v3
+        CC_TEST_REPORTER_ID: ecca14ba459b9f22f9a95816b496271974cd4c6155fc8a374facf07f6b79e7ef
       with:
-        github_token: ${{ env.GITHUB_TOKEN }}
-        publish_dir: ./pages
+        debug: true
+        coverageLocations: src/.coverage:coverage.py
+    
+
+#    - name: Generate Test Report Index
+#      env:
+#        BRANCH: ${{ github.ref_name}}
+#        REPOSITORY: ${{ github.repository}}
+#      run: |
+#        pushd pages/test_report
+#        echo "<html><head><title>JASMINE Testing Report</title></head><body><h1>JASMINE TESTING REPORT</h1><ul>" > index.html
+#        find . -name pytest.html | xargs -Ixxx dirname xxx | awk '{print substr($0, 3)}' | xargs -Ixxx echo "<li><a href=\"https://github.com/$REPOSITORY/actions/workflows/pytest.yml?query=branch:xxx\"><img src=\"https://github.com/$REPOSITORY/actions/workflows/pytest.yml/badge.svg?branch=xxx\" alt=\"pytest\" style=\"max-width: 100%;\"></a>xxx<a href=\"xxx/pytest.html\">(Test Report)</a><a href=\"xxx/htmlcov/index.html\">(Test Coverage Report)</a></li>" >> index.html
+#        echo "</ul></body></html>" >> index.html
+#        popd
+#      shell: bash
+
+#    - name: Publish Test Report
+#      uses: peaceiris/actions-gh-pages@v3
+#      with:
+#        github_token: ${{ env.GITHUB_TOKEN }}
+#        publish_dir: ./pages
 
     - name: Notice Error
       if: ${{ steps.pytest.outcome == 'failure' }}
