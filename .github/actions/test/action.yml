@@ -1,13 +1,13 @@
 runs:
   using: "Composite"
   steps:
-    - name: checkout Pages branch
-      uses: actions/checkout@v3
-      with:
-        ref: gh-pages
-        path: pages
-      id: check_out_pages_branch
-      continue-on-error: true
+#    - name: checkout Pages branch
+#      uses: actions/checkout@v3
+#      with:
+#        ref: gh-pages
+#        path: pages
+#      id: check_out_pages_branch
+#      continue-on-error: true
 
     - name: Test with pytest
       env:
