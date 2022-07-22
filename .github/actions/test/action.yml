@@ -19,6 +19,8 @@ runs:
         pushd src
         python -m pytest ../tests --junitxml=../pages/test_report/$BRANCH/pytest.xml --html=../pages/test_report/$BRANCH/pytest.html --cov=. --cov-branch --cov-report=term-missing --cov-report=html
         mv htmlcov ../pages/test_report/$BRANCH/
+        ls ../pages/test_report/$BRANCH/
+        ls ../pages/test_report/$BRANCH//htmlcov
         popd
       shell: bash
 
