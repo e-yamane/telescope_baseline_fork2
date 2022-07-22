@@ -18,9 +18,8 @@ runs:
         python -m pip install pytest pytest-html pytest-cov
         pushd src
         python -m pytest ../tests --junitxml=../pages/test_report/$BRANCH/pytest.xml --html=../pages/test_report/$BRANCH/pytest.html --cov=. --cov-branch --cov-report=term-missing --cov-report=html
+        rm htmlcov/.gitignore
         mv htmlcov ../pages/test_report/$BRANCH/
-        ls ../pages/test_report/$BRANCH/
-        ls ../pages/test_report/$BRANCH//htmlcov
         popd
       shell: bash
 
