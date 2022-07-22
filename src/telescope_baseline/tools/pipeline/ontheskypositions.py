@@ -1,7 +1,7 @@
 from telescope_baseline.tools.pipeline.simnode import SimNode
 
 
-class SkyPosition():
+class SkyPosition:
     """class of hold instantaneous stellar characteristics.
 
     """

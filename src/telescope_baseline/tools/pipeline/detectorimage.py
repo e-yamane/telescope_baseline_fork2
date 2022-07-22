@@ -35,6 +35,9 @@ class DetectorImage(SimComponent):
     def get_child(self, i: int):
         pass
 
+    def get_hdu(self):
+        return self.__hdu
+
     def get_parent_list(self):
         """ Get parent list.
 
@@ -54,6 +57,12 @@ class DetectorImage(SimComponent):
                 yp = int(self.__psf_w * np.random.randn() + s[0] + 0.5)
                 if 0 <= xp < self.__nx and 0 <= yp < self.__ny:
                     self.__array[xp][yp] += 1
+
+    def load(self, file_name: str):
+        ft = fits.open(file_name)
+        self.__nx = ft[0].header['NAXIS1']
+        self.__ny = ft[0].header['NAXIS2']
+        self.__hdu = ft[0]
 
     def make_fits(self):
         self.__hdu = fits.PrimaryHDU()

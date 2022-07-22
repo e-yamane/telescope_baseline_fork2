@@ -3,20 +3,23 @@ from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
 from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
 from telescope_baseline.tools.pipeline.stellarimage import StellarImage
 from visitor import SimVisitor
+from astropy import wcs
 
 
 class Analysis(SimVisitor):
     def visit_di(self, obj: DetectorImage):
-        # non operation
-        pass
+        try:
+            obj.load("output.fits")
+        except FileNotFoundError:
+            print('file not found.')
 
     def visit_si(self, obj: StellarImage):
         for i in range(obj.get_child_size()):
             obj.get_child(i).accept(self)
-        # extract()
-        # to_photon_num()
-        # construct_epsf()
-        # xmatch()
+        obj.extract()
+        obj.to_photon_num()
+        obj.construct_e_psf()
+        obj.x_match()
 
     def visit_os(self, obj: OnTheSkyPositions):
         for i in range(obj.get_child_size()):
@@ -33,14 +36,14 @@ class Analysis(SimVisitor):
 
 
 if __name__ == '__main__':
-    # generate object structure
-    a = AstrometricCatalogue()
-    o = []
-    for i in range(10):
-        o.append(OnTheSkyPositions())
-    for i in range(len(o)):
-        a.add_child(o[i])
+    w = wcs.WCS(naxis=2)
+    w.crpix = [256, 256]  # Reference point in pixel
+    w.cd = [[1.31e-4, 0], [0, 1.31e-4]]  # cd matrix
+    w.crval = [0, 0]  #
+    w.ctype = ["GLON-TAN", "GLAT-TAN"]
+    d = DetectorImage()
+    s = StellarImage(w)
+    s.add_child(d)
+
     v = Analysis()
-    a.accept(v)
-    # call accept method for top.
-    print("hello")
+    s.accept(v)

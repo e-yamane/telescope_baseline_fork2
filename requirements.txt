@@ -9,3 +9,5 @@ pytest~=7.1.1
 tables~=3.6.1
 exocounts~=0.1.0
 setuptools~=57.0.0
+photutils~=1.5.0
+tqdm~=4.64.0

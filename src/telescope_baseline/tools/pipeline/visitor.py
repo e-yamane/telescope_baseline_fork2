@@ -99,4 +99,3 @@ class DataTypeException(Exception):
 
     def __str__(self):
         return "Data Type Exception"
-

@@ -1,15 +1,11 @@
 from telescope_baseline.tools.pipeline.astrometriccatalogue import AstrometricCatalogue
 from telescope_baseline.tools.pipeline.detectorimage import DetectorImage
-from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions, SkyPosition
+from telescope_baseline.tools.pipeline.ontheskypositions import OnTheSkyPositions
 from telescope_baseline.tools.pipeline.stellarimage import StellarImage
-from telescope_baseline.tools.pipeline.catalogue_entry import CatalogueEntry
 from visitor import SimVisitor
-import astropy.units as u
 from astropy.time import Time
-from astropy.coordinates import SkyCoord
 import numpy as np
 from astropy import wcs
-from astropy.io import fits
 
 
 class Simulation(SimVisitor):
@@ -29,40 +25,48 @@ class Simulation(SimVisitor):
             obj.get_parent_list()
         # raise exception if the list is empty
         obj.make_image()  # generate fits
-        a = obj.make_fits()
-        a.writeto("output.fits", overwrite=True)
+        fits_data = obj.make_fits()
+        fits_data.writeto("output.fits", overwrite=True)
 
     def visit_si(self, obj: StellarImage):
         print("si")
         if obj.has_parent():
             obj.get_parent_list()
             obj.world_to_pixel()
-        for i in range(obj.get_child_size()):
-            obj.get_child(i).accept(self)
+        for ii in range(obj.get_child_size()):
+            obj.get_child(ii).accept(self)
 
     def visit_os(self, obj: OnTheSkyPositions):
         print("os")
         if obj.has_parent():
             obj.get_parent_list()
             obj.set_on_the_sky_list()
-        for i in range(obj.get_child_size()):
-            obj.get_child(i).accept(self)
+        for ii in range(obj.get_child_size()):
+            obj.get_child(ii).accept(self)
 
     def visit_ap(self, obj: AstrometricCatalogue):
         # non operation
         print("ap")
-        for i in range(obj.get_child_size()):
-            obj.get_child(i).accept(self)
+        for ii in range(obj.get_child_size()):
+            obj.get_child(ii).accept(self)
 
 
 if __name__ == '__main__':
     t = Time('2000-01-01 00:00:00.0')
-    pos = np.array([[50, 50, 1000],[28, 80, 1000]], dtype=np.float64)
+    a = []
+    for i in range(10):
+        x = 5 + np.random.rand() * 90
+        y = 5 + np.random.rand() * 90
+        m = np.random.rand() * 2000 + 2000
+        a.append([x, y, m])
+
+    pos = np.array(a, dtype=np.float64)
+    print(pos)
     w = wcs.WCS(naxis=2)
-    w.wcs.crpix = [256, 256]  # Reference point in pixel
-    w.wcs.cd = [[1.31e-4,0], [0,1.31e-4]]  # cd matrix
-    w.wcs.crval = [0, 0]  #
-    w.wcs.ctype = ["GLON-TAN", "GLAT-TAN"]
+    w.crpix = [256, 256]  # Reference point in pixel
+    w.cd = [[1.31e-4, 0], [0, 1.31e-4]]  # cd matrix
+    w.crval = [0, 0]  #
+    w.ctype = ["GLON-TAN", "GLAT-TAN"]
 
     s = StellarImage(w)
     s.add_position(pos)
@@ -73,4 +77,3 @@ if __name__ == '__main__':
     s.accept(v)
 
     print(s.get_list())
-
