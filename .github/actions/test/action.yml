@@ -26,16 +26,15 @@ runs:
       shell: bash
 
     - name: Send Coverage Report to CodeClimate
-#      if: ${{ steps.pytest.outcome == 'success' }}
-#    　　　　uses: paambaati/codeclimate-action@v3.0.0
+    　　　　uses: paambaati/codeclimate-action@v3.0.0
       env:
         CC_TEST_REPORTER_ID: ecca14ba459b9f22f9a95816b496271974cd4c6155fc8a374facf07f6b79e7ef
-#      with:
-#        debug: true
-#        coverageLocations: src/.coverage:coverage.py
-      run: |
-        echo $CC_TEST_REPORTER_ID
-      shell: bash
+      with:
+        debug: true
+        coverageLocations: src/.coverage:coverage.py
+#      run: |
+#        echo $CC_TEST_REPORTER_ID
+#      shell: bash
         
     
 
