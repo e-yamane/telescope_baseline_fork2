@@ -20,4 +20,4 @@ class Calc:
             return self.a/self.b
 
     def lotOfParam(a,b,c,d,e,f,g,h,i,j,k,l,m,n):
-	return a+b+c+d+e+f+g
+        return a+b+c+d+e+f+g
