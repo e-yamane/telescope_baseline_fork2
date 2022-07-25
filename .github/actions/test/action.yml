@@ -17,6 +17,7 @@ runs:
       run: |
         python -m pip install pytest pytest-html pytest-cov
         pushd src
+        cp ../.coveragerc .
         python -m pytest ../tests --junitxml=../pages/test_report/$BRANCH/pytest.xml --html=../pages/test_report/$BRANCH/pytest.html --cov=. --cov-branch --cov-report=term-missing --cov-report=html --cov-report xml
         rm htmlcov/.gitignore
         rm -rf ../pages/test_report/$BRANCH/htmlcov
