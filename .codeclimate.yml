@@ -3,5 +3,5 @@ plugins:
     enabled: true
   pep8:
     enabled: true
- radon: 
-  enabled: true
+  radon: 
+    enabled: true
