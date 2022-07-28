@@ -12,9 +12,11 @@ runs:
     - name: Test with pytest
       env:
         BRANCH: ${{ github.ref_name}}
+        CC_TEST_REPORTER_ID: ${{ env.CC_TEST_REPORTER_ID }}
       id: pytest
       continue-on-error: true
       run: |
+	echo $CC_TEST_REPORTER_ID
         python -m pip install pytest pytest-html pytest-cov
         pushd src
         cp ../.coveragerc .
