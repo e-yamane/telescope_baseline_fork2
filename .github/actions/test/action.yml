@@ -29,8 +29,8 @@ runs:
     - name: Send Coverage Report to CodeClimate
       if: ${{ steps.pytest.outcome == 'success' }}
       uses: paambaati/codeclimate-action@v3.0.0
-#      env:
-#        CC_TEST_REPORTER_ID: ecca14ba459b9f22f9a95816b496271974cd4c6155fc8a374facf07f6b79e7ef
+      env:
+        CC_TEST_REPORTER_ID: ${{ env.CC_TEST_REPORTER_ID }}
       with:
         debug: true
         coverageLocations: src/coverage.xml:coverage.py
