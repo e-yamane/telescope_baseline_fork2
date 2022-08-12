@@ -7,7 +7,7 @@ import pkg_resources
 from telescope_baseline.dataclass.efficiency import Efficiency
 
 
-class Parameters:
+class Parameters:  # noqa
     """This class is parameter holder
 
     The parameter holder class Parameters is implemented in Singleton pattern (see. GoF book).
