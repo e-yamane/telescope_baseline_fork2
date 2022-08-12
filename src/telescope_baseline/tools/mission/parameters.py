@@ -7,6 +7,7 @@ import pkg_resources
 from telescope_baseline.dataclass.efficiency import Efficiency
 
 
+# noqa
 class Parameters:  # noqa
     """This class is parameter holder
 
