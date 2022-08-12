@@ -11,7 +11,7 @@ from telescope_baseline.dataclass.efficiency import Efficiency
 class Parameters:  # noqa
     """This class is parameter holder
 
-    The parameter holder class Parameters is implemented in Singleton pattern (see. GoF book).
+    The parameter holder class Parameters is implemented in Singleton pattern (see. GoF book).  # noqa
     Below properties are defined.
 
     Properties:
