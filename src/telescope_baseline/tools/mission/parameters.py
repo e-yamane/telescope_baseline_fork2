@@ -62,8 +62,7 @@ class Parameters:  # noqa
             Parameters()
         return Parameters.__instance
 
-    # noqa
-    def __init__(self):
+    def __init__(self):  # noqa
         if Parameters.__instance is None:
             Parameters.__instance = self
         else:
